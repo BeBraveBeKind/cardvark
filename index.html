@@ -161,6 +161,10 @@
             color: #fff;
         }
 
+        .btn:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -240,6 +244,52 @@
         .contact-field a {
             color: #4a6cf7;
             text-decoration: none;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: #0f0f23;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 10px 6px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s, transform 0.1s;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+            background: #1a1a3e;
+        }
+
+        .action-btn:hover {
+            border-color: #4a6cf7;
+            background: #1a1a3e;
+        }
+
+        .action-btn .action-icon {
+            font-size: 1.25rem;
+            line-height: 1;
+        }
+
+        .action-btn .action-label {
+            font-size: 0.6875rem;
+            color: #aaa;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
         }
 
         .hidden {
@@ -460,6 +510,212 @@
         .btn-coffee:hover {
             background: #e6c700;
         }
+
+        /* Template Picker & LinkedIn Modal */
+        .picker-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            transition: background 0.2s ease;
+            pointer-events: none;
+        }
+
+        .picker-modal.visible {
+            background: rgba(0, 0, 0, 0.75);
+            pointer-events: auto;
+        }
+
+        .picker-content {
+            background: #16213e;
+            border-radius: 16px 16px 0 0;
+            padding: 24px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        .picker-modal.visible .picker-content {
+            transform: translateY(0);
+        }
+
+        .picker-content::before {
+            content: '';
+            display: block;
+            width: 36px;
+            height: 4px;
+            background: #555;
+            border-radius: 2px;
+            margin: 0 auto 16px;
+        }
+
+        .picker-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .picker-subtitle {
+            font-size: 0.8125rem;
+            color: #888;
+            margin-bottom: 16px;
+        }
+
+        .template-card {
+            background: #0f0f23;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .template-card:hover {
+            border-color: #4a6cf7;
+            background: #1a1a3e;
+        }
+
+        .template-card:active {
+            transform: scale(0.98);
+            background: #1a1a3e;
+        }
+
+        .template-card .template-name {
+            font-weight: 600;
+            font-size: 0.9375rem;
+            margin-bottom: 4px;
+        }
+
+        .template-card .template-preview {
+            font-size: 0.8125rem;
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .custom-template-inputs {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .custom-template-inputs.active {
+            display: flex;
+        }
+
+        .custom-template-inputs input,
+        .custom-template-inputs textarea {
+            background: #0f0f23;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 12px;
+            color: #eee;
+            font-family: inherit;
+            font-size: 0.875rem;
+            resize: vertical;
+        }
+
+        .custom-template-inputs textarea {
+            min-height: 80px;
+        }
+
+        .custom-template-inputs input:focus,
+        .custom-template-inputs textarea:focus {
+            outline: none;
+            border-color: #4a6cf7;
+        }
+
+        .picker-cancel {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 14px;
+            color: #888;
+            font-size: 0.875rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            margin-top: 8px;
+        }
+
+        .picker-cancel:hover {
+            color: #fff;
+        }
+
+        /* LinkedIn button */
+        .btn-linkedin {
+            background: #0a66c2;
+            color: #fff;
+        }
+
+        .btn-linkedin:hover {
+            background: #004182;
+        }
+
+        /* Connection note copy cards */
+        .note-card {
+            background: #0f0f23;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+        }
+
+        .note-card:hover {
+            border-color: #0a66c2;
+            background: #1a1a3e;
+        }
+
+        .note-card:active {
+            transform: scale(0.98);
+            background: #1a1a3e;
+        }
+
+        .note-card .note-label {
+            font-weight: 600;
+            font-size: 0.8125rem;
+            color: #0a66c2;
+            margin-bottom: 4px;
+        }
+
+        .note-card .note-text {
+            font-size: 0.875rem;
+            color: #ccc;
+            line-height: 1.4;
+        }
+
+        .note-card .copied-badge {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            background: #22c55e;
+            color: #fff;
+            font-size: 0.6875rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .note-card .copied-badge.show {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -508,12 +764,26 @@
                 
                 <div id="contactFields"></div>
 
-                <div class="button-row" style="margin-top: 20px;">
-                    <button class="btn btn-success" id="addToBatchBtn">Add & Scan Next</button>
-                    <button class="btn btn-secondary" id="scanAnotherBtn">Skip</button>
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-success" id="addToBatchBtn" style="width:100%;">Add & Scan Next</button>
                 </div>
-                <div class="button-row" style="margin-top: 8px;">
-                    <button class="btn btn-primary" id="saveContactBtn">Download vCard</button>
+                <div class="action-row" style="margin-top: 12px;">
+                    <button class="action-btn" id="followUpBtn" style="display:none;">
+                        <span class="action-icon">✉️</span>
+                        <span class="action-label">Follow Up</span>
+                    </button>
+                    <button class="action-btn" id="linkedInBtn">
+                        <span class="action-icon">💼</span>
+                        <span class="action-label">LinkedIn</span>
+                    </button>
+                    <button class="action-btn" id="saveContactBtn">
+                        <span class="action-icon">👤</span>
+                        <span class="action-label">Save vCard</span>
+                    </button>
+                    <button class="action-btn" id="scanAnotherBtn">
+                        <span class="action-icon">⏭</span>
+                        <span class="action-label">Skip</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -526,6 +796,66 @@
                 Brought to you by <a href="https://rise-above.net" target="_blank" rel="noopener">Rise Above Partners</a>
             </div>
         </footer>
+    </div>
+
+    <!-- Email Follow-Up Picker -->
+    <div id="emailPicker" class="picker-modal hidden">
+        <div class="picker-content">
+            <div class="picker-title">Send a Follow-Up</div>
+            <div class="picker-subtitle" id="emailPickerSubtitle">Choose a template</div>
+
+            <div class="template-card" data-template="quick">
+                <div class="template-name">Quick Connect</div>
+                <div class="template-preview">Great connecting with you. I'd love to stay in touch...</div>
+            </div>
+            <div class="template-card" data-template="followup">
+                <div class="template-name">Follow Up on Chat</div>
+                <div class="template-preview">Really enjoyed our conversation. I wanted to follow up...</div>
+            </div>
+            <div class="template-card" data-template="meeting">
+                <div class="template-name">Request a Meeting</div>
+                <div class="template-preview">I'd love to set up a time to chat more about...</div>
+            </div>
+            <div class="template-card" data-template="custom">
+                <div class="template-name">Custom Message</div>
+                <div class="template-preview">Write your own subject and body</div>
+            </div>
+
+            <div class="custom-template-inputs" id="customEmailInputs">
+                <input type="text" id="customSubject" placeholder="Subject line...">
+                <textarea id="customBody" placeholder="Your message..."></textarea>
+                <button class="btn btn-primary" id="sendCustomEmail">Open in Email</button>
+            </div>
+
+            <button class="picker-cancel" id="emailPickerCancel">Cancel</button>
+        </div>
+    </div>
+
+    <!-- LinkedIn Connect Modal -->
+    <div id="linkedInPicker" class="picker-modal hidden">
+        <div class="picker-content">
+            <div class="picker-title">Connect on LinkedIn</div>
+            <div class="picker-subtitle" id="linkedInPickerSubtitle">Copy a connection note, then open LinkedIn</div>
+
+            <div class="note-card" data-note="event">
+                <div class="note-label">Event Connect</div>
+                <div class="note-text" id="noteEvent"></div>
+                <span class="copied-badge">Copied!</span>
+            </div>
+            <div class="note-card" data-note="professional">
+                <div class="note-label">Professional</div>
+                <div class="note-text" id="noteProfessional"></div>
+                <span class="copied-badge">Copied!</span>
+            </div>
+            <div class="note-card" data-note="brief">
+                <div class="note-label">Brief</div>
+                <div class="note-text" id="noteBrief"></div>
+                <span class="copied-badge">Copied!</span>
+            </div>
+
+            <button class="btn btn-linkedin" id="openLinkedIn" style="width:100%; margin-top: 12px;">Open LinkedIn</button>
+            <button class="picker-cancel" id="linkedInPickerCancel">Cancel</button>
+        </div>
     </div>
 
     <!-- Donation Modal -->
@@ -549,9 +879,9 @@
         let contactsBatch = [];
 
         // Donation prompt config
-        const donationThresholds = [3, 10, 20];
+        const donationThresholds = [2, 10, 20];
         const donationMessages = {
-            3: "Heads up—this free tool costs real money to run. If Cardvark is saving you time, consider buying me a coffee to keep it going.",
+            2: "Hey, nice — Cardvark just saved you some typing. This tool costs about $0.20 per scan to run. If it's useful, a quick coffee helps keep it free.",
             10: "You're getting good use out of this! A small donation helps cover the AI costs and keeps Cardvark free for everyone.",
             20: "Hey, I noticed you're really digging this. Did you know this costs me about $0.20 per scan? If you haven't already, I'd really appreciate a quick donation. $5 now will keep this service free for a long time."
         };
@@ -801,6 +1131,14 @@
             }
             
             contactCard.classList.remove('hidden');
+
+            // Show/hide follow-up button based on email availability
+            const hasEmail = toArray(contact.email).length > 0;
+            followUpBtn.style.display = hasEmail ? '' : 'none';
+
+            // Show/hide LinkedIn button — need a name, company, or linkedin URL to search
+            const hasLinkedInData = contact.linkedin || contact.first_name || contact.last_name || contact.company;
+            linkedInBtn.style.display = hasLinkedInData ? '' : 'none';
         }
 
         function createField(icon, value, href = null) {
@@ -1021,6 +1359,187 @@
             });
         }
 
+        // Picker modal open/close with animation
+        function openPicker(modal) {
+            closeAllPickers();
+            modal.classList.remove('hidden');
+            // Force reflow before adding visible class for transition
+            modal.offsetHeight;
+            modal.classList.add('visible');
+        }
+
+        function closePicker(modal) {
+            modal.classList.remove('visible');
+            modal.addEventListener('transitionend', function handler() {
+                modal.classList.add('hidden');
+                modal.removeEventListener('transitionend', handler);
+            });
+        }
+
+        function closeAllPickers() {
+            document.querySelectorAll('.picker-modal').forEach(m => {
+                m.classList.remove('visible');
+                m.classList.add('hidden');
+            });
+        }
+
+        // --- Feature 2: Email Follow-Up ---
+        const emailPicker = document.getElementById('emailPicker');
+        const emailPickerSubtitle = document.getElementById('emailPickerSubtitle');
+        const customEmailInputs = document.getElementById('customEmailInputs');
+        const followUpBtn = document.getElementById('followUpBtn');
+
+        const emailTemplates = {
+            quick: {
+                subject: (c) => c.first_name ? `Great meeting you, ${c.first_name}` : 'Great meeting you',
+                body: (c) => `Hi${c.first_name ? ' ' + c.first_name : ''},\n\nGreat connecting with you. I'd love to stay in touch — let me know if there's ever anything I can help with.\n\nBest,\n`
+            },
+            followup: {
+                subject: (c) => c.first_name ? `Following up — ${c.first_name}` : 'Following up',
+                body: (c) => `Hi${c.first_name ? ' ' + c.first_name : ''},\n\nReally enjoyed our conversation. I wanted to follow up while it's fresh — would love to continue the discussion.\n\nLooking forward to it,\n`
+            },
+            meeting: {
+                subject: (c) => c.first_name ? `Let's connect, ${c.first_name}` : `Let's connect`,
+                body: (c) => `Hi${c.first_name ? ' ' + c.first_name : ''},\n\nIt was great meeting you. I'd love to set up a time to chat more about what you're doing at ${c.company || 'your company'}. Would you have 15 minutes this week?\n\nBest,\n`
+            }
+        };
+
+        function openEmailPicker() {
+            if (!parsedContact) return;
+            closeAllPickers();
+            const emails = Array.isArray(parsedContact.email) ? parsedContact.email.filter(Boolean) : (parsedContact.email ? [parsedContact.email] : []);
+            if (emails.length === 0) return;
+            const name = [parsedContact.first_name, parsedContact.last_name].filter(Boolean).join(' ') || 'contact';
+            emailPickerSubtitle.textContent = `To: ${name} (${emails[0]})`;
+            customEmailInputs.classList.remove('active');
+            openPicker(emailPicker);
+        }
+
+        function openMailto(email, subject, body) {
+            const url = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            const a = document.createElement('a');
+            a.href = url;
+            a.setAttribute('target', '_self');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function sendTemplateEmail(templateId) {
+            if (!parsedContact) return;
+            const emails = Array.isArray(parsedContact.email) ? parsedContact.email.filter(Boolean) : (parsedContact.email ? [parsedContact.email] : []);
+            if (emails.length === 0) return;
+            const tmpl = emailTemplates[templateId];
+            openMailto(emails[0], tmpl.subject(parsedContact), tmpl.body(parsedContact));
+            closePicker(emailPicker);
+            showStatus('Email draft opened!', 'success');
+        }
+
+        function sendCustomEmail() {
+            if (!parsedContact) return;
+            const emails = Array.isArray(parsedContact.email) ? parsedContact.email.filter(Boolean) : (parsedContact.email ? [parsedContact.email] : []);
+            if (emails.length === 0) return;
+            openMailto(emails[0], document.getElementById('customSubject').value, document.getElementById('customBody').value);
+            closePicker(emailPicker);
+            showStatus('Email draft opened!', 'success');
+        }
+
+        // Template card clicks
+        document.querySelectorAll('#emailPicker .template-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const tmpl = card.dataset.template;
+                if (tmpl === 'custom') {
+                    customEmailInputs.classList.toggle('active');
+                    if (parsedContact) {
+                        document.getElementById('customBody').value = `Hi${parsedContact.first_name ? ' ' + parsedContact.first_name : ''},\n\n`;
+                    }
+                } else {
+                    sendTemplateEmail(tmpl);
+                }
+            });
+        });
+
+        // Scroll inputs into view when iOS keyboard appears
+        document.getElementById('customSubject').addEventListener('focus', (e) => {
+            setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
+        });
+        document.getElementById('customBody').addEventListener('focus', (e) => {
+            setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
+        });
+
+        document.getElementById('sendCustomEmail').addEventListener('click', sendCustomEmail);
+        document.getElementById('emailPickerCancel').addEventListener('click', () => closePicker(emailPicker));
+        emailPicker.addEventListener('click', (e) => { if (e.target === emailPicker) closePicker(emailPicker); });
+
+        // --- Feature 3: LinkedIn + Follow ---
+        const linkedInPicker = document.getElementById('linkedInPicker');
+        const linkedInBtn = document.getElementById('linkedInBtn');
+        let linkedInUrl = '';
+
+        function openLinkedInPicker() {
+            if (!parsedContact) return;
+            closeAllPickers();
+            const firstName = parsedContact.first_name || '';
+            const lastName = parsedContact.last_name || '';
+            const company = parsedContact.company || '';
+            const name = [firstName, lastName].filter(Boolean).join(' ') || 'this contact';
+
+            document.getElementById('linkedInPickerSubtitle').textContent = `Copy a note, then find ${name} on LinkedIn`;
+
+            // Build connection notes
+            const greeting = firstName ? `Hi ${firstName}, ` : 'Hi, ';
+            document.getElementById('noteEvent').textContent = `${greeting}great meeting you! Wanted to connect here to stay in touch.`;
+            document.getElementById('noteProfessional').textContent = `${greeting}I came across your work at ${company || 'your company'} and would love to connect.`;
+            document.getElementById('noteBrief').textContent = firstName ? `Hi ${firstName} — let's connect!` : `Hey — let's connect!`;
+
+            // Build LinkedIn URL
+            if (parsedContact.linkedin) {
+                linkedInUrl = parsedContact.linkedin.startsWith('http') ? parsedContact.linkedin : `https://linkedin.com/in/${parsedContact.linkedin.replace(/^@/, '')}`;
+            } else {
+                const query = [firstName, lastName, company, 'site:linkedin.com/in/'].filter(Boolean).join('+');
+                linkedInUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            }
+
+            // Reset copied badges
+            document.querySelectorAll('#linkedInPicker .copied-badge').forEach(b => b.classList.remove('show'));
+            openPicker(linkedInPicker);
+        }
+
+        // Note card copy
+        document.querySelectorAll('#linkedInPicker .note-card').forEach(card => {
+            card.addEventListener('click', async () => {
+                const text = card.querySelector('.note-text').textContent;
+                try {
+                    await navigator.clipboard.writeText(text);
+                } catch (err) {
+                    // Fallback for iOS Safari: temporary textarea
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.style.position = 'fixed';
+                    ta.style.opacity = '0';
+                    document.body.appendChild(ta);
+                    ta.focus();
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                }
+                // Reset all badges, show this one
+                document.querySelectorAll('#linkedInPicker .copied-badge').forEach(b => b.classList.remove('show'));
+                const badge = card.querySelector('.copied-badge');
+                badge.classList.add('show');
+                setTimeout(() => badge.classList.remove('show'), 2000);
+            });
+        });
+
+        document.getElementById('openLinkedIn').addEventListener('click', () => {
+            window.open(linkedInUrl, '_blank', 'noopener');
+            closePicker(linkedInPicker);
+            showStatus('LinkedIn opened — paste your note!', 'success');
+        });
+
+        document.getElementById('linkedInPickerCancel').addEventListener('click', () => closePicker(linkedInPicker));
+        linkedInPicker.addEventListener('click', (e) => { if (e.target === linkedInPicker) closePicker(linkedInPicker); });
+
         // Event listeners
         captureBtn.addEventListener('click', capturePhoto);
         retakeBtn.addEventListener('click', retakePhoto);
@@ -1030,6 +1549,8 @@
         addToBatchBtn.addEventListener('click', addToBatch);
         clearAllBtn.addEventListener('click', clearBatch);
         exportCsvBtn.addEventListener('click', exportCSV);
+        followUpBtn.addEventListener('click', openEmailPicker);
+        linkedInBtn.addEventListener('click', openLinkedInPicker);
 
         // Register service worker for PWA
         if ('serviceWorker' in navigator) {

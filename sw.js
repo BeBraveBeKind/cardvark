@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardvark-v3';
+const CACHE_NAME = 'cardvark-v5';
 const ASSETS = [
   '/',
   '/index.html',
