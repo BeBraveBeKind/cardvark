@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cardvark">
+    <meta name="theme-color" content="#1a1a2e">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon192.png">
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
+    <title>Cardvark - Business Card Scanner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .wordmark {
+            font-family: 'Bungee', cursive;
+            font-size: 2.25rem;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        .subhead {
+            font-size: 0.875rem;
+            color: #888;
+            font-weight: 400;
+            margin-top: 4px;
+        }
+
+        .install-link {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 0.8125rem;
+            color: #4a6cf7;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .install-link:hover {
+            color: #6b8cff;
+            text-decoration: underline;
+        }
+
+        .camera-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .preview-container {
+            position: relative;
+            background: #0f0f23;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+        }
+
+        #video, #canvas, #preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        #preview {
+            display: none;
+        }
+
+        .capture-btn {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            background: transparent;
+            cursor: pointer;
+            margin: 0 auto;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .capture-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #fff;
+            transition: all 0.2s;
+        }
+
+        .capture-btn:active::after {
+            transform: translate(-50%, -50%) scale(0.9);
+        }
+
+        .capture-btn:disabled {
+            opacity: 0.5;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #4a6cf7;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #3a5ce7;
+        }
+
+        .btn-secondary {
+            background: #333;
+            color: #fff;
+        }
+
+        .btn-success {
+            background: #22c55e;
+            color: #fff;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .button-row .btn {
+            flex: 1;
+        }
+
+        .status {
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+
+        .status.loading {
+            background: #16213e;
+            color: #4a6cf7;
+        }
+
+        .status.error {
+            background: #3b1219;
+            color: #f87171;
+        }
+
+        .status.success {
+            background: #14532d;
+            color: #4ade80;
+        }
+
+        .contact-card {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 16px;
+        }
+
+        .contact-card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 4px;
+        }
+
+        .contact-card .company {
+            color: #888;
+            font-size: 0.875rem;
+            margin-bottom: 16px;
+        }
+
+        .contact-field {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .contact-field:last-child {
+            border-bottom: none;
+        }
+
+        .contact-field .icon {
+            width: 20px;
+            text-align: center;
+            color: #666;
+        }
+
+        .contact-field .value {
+            flex: 1;
+        }
+
+        .contact-field a {
+            color: #4a6cf7;
+            text-decoration: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #333;
+            border-top-color: #4a6cf7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .ocr-preview {
+            background: #0f0f23;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #888;
+            max-height: 100px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* Batch contacts section */
+        .batch-section {
+            background: #16213e;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .batch-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .batch-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .batch-count {
+            background: #4a6cf7;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .batch-list {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+        }
+
+        .batch-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: #0f0f23;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .batch-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .batch-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .batch-item-name {
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .batch-item-company {
+            font-size: 0.75rem;
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .batch-item-remove {
+            background: none;
+            border: none;
+            color: #f87171;
+            cursor: pointer;
+            padding: 4px 8px;
+            font-size: 1.25rem;
+            line-height: 1;
+        }
+
+        .batch-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .batch-actions .btn {
+            flex: 1;
+            padding: 10px 16px;
+            font-size: 0.875rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 24px 0 12px;
+            margin-top: auto;
+        }
+
+        .footer-coffee {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffdd00;
+            color: #000;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .footer-coffee:hover {
+            background: #e6c700;
+        }
+
+        .footer-attribution {
+            margin-top: 16px;
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .footer-attribution a {
+            color: #888;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-attribution a:hover {
+            color: #fff;
+        }
+
+        /* Donation Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: #16213e;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 360px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .modal-content .modal-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        .modal-content p {
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .modal-buttons .btn {
+            width: 100%;
+        }
+
+        .btn-coffee {
+            background: #ffdd00;
+            color: #000;
+            font-weight: 700;
+        }
+
+        .btn-coffee:hover {
+            background: #e6c700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="wordmark">Cardvark</h1>
+            <p class="subhead">Business Card Scanner</p>
+            <a href="install.html" class="install-link" id="installLink">Add to your home screen →</a>
+        </header>
+
+        <!-- Batch contacts section -->
+        <div id="batchSection" class="batch-section hidden">
+            <div class="batch-header">
+                <h3>Scanned Contacts</h3>
+                <span class="batch-count" id="batchCount">0</span>
+            </div>
+            <div class="batch-list" id="batchList"></div>
+            <div class="batch-actions">
+                <button class="btn btn-secondary" id="clearAllBtn">Clear All</button>
+                <button class="btn btn-success" id="exportCsvBtn">Export CSV</button>
+            </div>
+        </div>
+
+        <div class="camera-section">
+            <div class="preview-container">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="canvas"></canvas>
+                <img id="preview" alt="Captured image">
+            </div>
+
+            <div id="captureControls">
+                <button class="capture-btn" id="captureBtn" disabled></button>
+            </div>
+
+            <div id="reviewControls" class="button-row hidden">
+                <button class="btn btn-secondary" id="retakeBtn">Retake</button>
+                <button class="btn btn-primary" id="processBtn">Process Card</button>
+            </div>
+
+            <div id="status" class="status hidden"></div>
+            <div id="ocrPreview" class="ocr-preview hidden"></div>
+
+            <div id="contactCard" class="contact-card hidden">
+                <h2 id="contactName">—</h2>
+                <div class="company" id="contactCompany">—</div>
+                
+                <div id="contactFields"></div>
+
+                <div class="button-row" style="margin-top: 20px;">
+                    <button class="btn btn-success" id="addToBatchBtn">Add & Scan Next</button>
+                    <button class="btn btn-secondary" id="scanAnotherBtn">Skip</button>
+                </div>
+                <div class="button-row" style="margin-top: 8px;">
+                    <button class="btn btn-primary" id="saveContactBtn">Download vCard</button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <a href="https://buymeacoffee.com/riseabovepartners" target="_blank" rel="noopener" class="footer-coffee">
+                ☕ Buy me a coffee
+            </a>
+            <div class="footer-attribution">
+                Brought to you by <a href="https://rise-above.net" target="_blank" rel="noopener">Rise Above Partners</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Donation Modal -->
+    <div id="donationModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-icon">☕</div>
+            <p id="donationMessage"></p>
+            <div class="modal-buttons">
+                <a href="https://buymeacoffee.com/riseabovepartners" target="_blank" rel="noopener" class="btn btn-coffee">Buy me a coffee</a>
+                <button class="btn btn-secondary" id="dismissDonation">Maybe later</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let stream = null;
+        let capturedImage = null;
+        let parsedContact = null;
+        let sessionScanCount = 0;
+        let contactsBatch = [];
+
+        // Donation prompt config
+        const donationThresholds = [3, 10, 20];
+        const donationMessages = {
+            3: "Heads up—this free tool costs real money to run. If Cardvark is saving you time, consider buying me a coffee to keep it going.",
+            10: "You're getting good use out of this! A small donation helps cover the AI costs and keeps Cardvark free for everyone.",
+            20: "Hey, I noticed you're really digging this. Did you know this costs me about $0.20 per scan? If you haven't already, I'd really appreciate a quick donation. $5 now will keep this service free for a long time."
+        };
+
+        // Elements
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const preview = document.getElementById('preview');
+        const captureBtn = document.getElementById('captureBtn');
+        const retakeBtn = document.getElementById('retakeBtn');
+        const processBtn = document.getElementById('processBtn');
+        const captureControls = document.getElementById('captureControls');
+        const reviewControls = document.getElementById('reviewControls');
+        const statusEl = document.getElementById('status');
+        const ocrPreview = document.getElementById('ocrPreview');
+        const contactCard = document.getElementById('contactCard');
+        const saveContactBtn = document.getElementById('saveContactBtn');
+        const scanAnotherBtn = document.getElementById('scanAnotherBtn');
+        const addToBatchBtn = document.getElementById('addToBatchBtn');
+        const donationModal = document.getElementById('donationModal');
+        const donationMessage = document.getElementById('donationMessage');
+        const dismissDonation = document.getElementById('dismissDonation');
+        const installLink = document.getElementById('installLink');
+        const batchSection = document.getElementById('batchSection');
+        const batchList = document.getElementById('batchList');
+        const batchCount = document.getElementById('batchCount');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        const exportCsvBtn = document.getElementById('exportCsvBtn');
+
+        // Proxy URL
+        const PROXY_URL = 'https://claude-proxy.michael-eb0.workers.dev';
+
+        // Hide install link if already in standalone mode
+        function initInstallLink() {
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+                installLink.style.display = 'none';
+            }
+        }
+
+        // Donation Modal Logic
+        function checkDonationPrompt() {
+            if (donationThresholds.includes(sessionScanCount)) {
+                showDonationModal(donationMessages[sessionScanCount]);
+            }
+        }
+
+        function showDonationModal(message) {
+            donationMessage.textContent = message;
+            donationModal.classList.remove('hidden');
+        }
+
+        function hideDonationModal() {
+            donationModal.classList.add('hidden');
+        }
+
+        dismissDonation.addEventListener('click', hideDonationModal);
+
+        // Close modal on overlay click
+        donationModal.addEventListener('click', (e) => {
+            if (e.target === donationModal) {
+                hideDonationModal();
+            }
+        });
+
+        // Initialize camera
+        async function initCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    }
+                });
+                video.srcObject = stream;
+                captureBtn.disabled = false;
+            } catch (err) {
+                showStatus('Camera access denied. Please allow camera permissions.', 'error');
+                console.error(err);
+            }
+        }
+
+        // Capture photo
+        function capturePhoto() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+            
+            capturedImage = canvas.toDataURL('image/jpeg', 0.9);
+            preview.src = capturedImage;
+            
+            video.classList.add('hidden');
+            preview.classList.remove('hidden');
+            captureControls.classList.add('hidden');
+            reviewControls.classList.remove('hidden');
+            contactCard.classList.add('hidden');
+            hideStatus();
+        }
+
+        // Retake photo
+        function retakePhoto() {
+            preview.classList.add('hidden');
+            video.classList.remove('hidden');
+            reviewControls.classList.add('hidden');
+            captureControls.classList.remove('hidden');
+            contactCard.classList.add('hidden');
+            ocrPreview.classList.add('hidden');
+            hideStatus();
+            capturedImage = null;
+        }
+
+        // Call Claude Vision API to read business card directly
+        async function parseBusinessCard(imageDataUrl) {
+            showStatus('Reading business card...', 'loading');
+
+            // Extract base64 data from data URL
+            const base64Data = imageDataUrl.split(',')[1];
+
+            const response = await fetch(PROXY_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: 'claude-sonnet-4-20250514',
+                    max_tokens: 1024,
+                    messages: [{
+                        role: 'user',
+                        content: [
+                            {
+                                type: 'image',
+                                source: {
+                                    type: 'base64',
+                                    media_type: 'image/jpeg',
+                                    data: base64Data
+                                }
+                            },
+                            {
+                                type: 'text',
+                                text: `Extract contact information from this business card image. Return ONLY a valid JSON object with these exact keys (use null for missing fields, use arrays for email and phone even if there's only one):
+
+{"first_name": "", "last_name": "", "company": "", "job_title": "", "email": [], "phone": [], "address": "", "website": "", "linkedin": "", "twitter": "", "instagram": ""}`
+                            }
+                        ]
+                    }]
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error?.message || 'API request failed');
+            }
+
+            const data = await response.json();
+            const text = data.content[0].text;
+            
+            // Extract JSON from response
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) {
+                throw new Error('Could not parse response as JSON');
+            }
+            
+            return JSON.parse(jsonMatch[0]);
+        }
+
+        // Process the card
+        async function processCard() {
+            try {
+                processBtn.disabled = true;
+                ocrPreview.classList.add('hidden');
+                
+                parsedContact = await parseBusinessCard(capturedImage);
+                displayContact(parsedContact);
+                
+                // Increment scan count and check for donation prompt
+                sessionScanCount++;
+                checkDonationPrompt();
+                
+                showStatus('Contact parsed successfully!', 'success');
+            } catch (err) {
+                showStatus(err.message, 'error');
+                console.error(err);
+            } finally {
+                processBtn.disabled = false;
+            }
+        }
+
+        // Display parsed contact
+        function displayContact(contact) {
+            const name = [contact.first_name, contact.last_name].filter(Boolean).join(' ') || '—';
+            const companyLine = [contact.job_title, contact.company].filter(Boolean).join(' at ') || '—';
+            
+            document.getElementById('contactName').textContent = name;
+            document.getElementById('contactCompany').textContent = companyLine;
+            
+            // Build contact fields dynamically
+            const fieldsContainer = document.getElementById('contactFields');
+            fieldsContainer.innerHTML = '';
+            
+            // Helper to normalize arrays
+            const toArray = (val) => {
+                if (!val) return [];
+                if (Array.isArray(val)) return val.filter(Boolean);
+                return [val];
+            };
+            
+            // Emails
+            const emails = toArray(contact.email);
+            emails.forEach(email => {
+                fieldsContainer.innerHTML += createField('✉️', email, `mailto:${email}`);
+            });
+            
+            // Phones
+            const phones = toArray(contact.phone);
+            phones.forEach(phone => {
+                fieldsContainer.innerHTML += createField('📱', phone, `tel:${phone.replace(/\s/g, '')}`);
+            });
+            
+            // Address
+            if (contact.address) {
+                fieldsContainer.innerHTML += createField('📍', contact.address);
+            }
+            
+            // Website
+            if (contact.website) {
+                const url = contact.website.startsWith('http') ? contact.website : `https://${contact.website}`;
+                fieldsContainer.innerHTML += createField('🌐', contact.website, url);
+            }
+            
+            // LinkedIn
+            if (contact.linkedin) {
+                const url = contact.linkedin.startsWith('http') ? contact.linkedin : `https://linkedin.com/in/${contact.linkedin.replace(/^@/, '')}`;
+                fieldsContainer.innerHTML += createField('💼', contact.linkedin, url);
+            }
+            
+            // Twitter/X
+            if (contact.twitter) {
+                const handle = contact.twitter.replace(/^@/, '');
+                fieldsContainer.innerHTML += createField('𝕏', `@${handle}`, `https://x.com/${handle}`);
+            }
+            
+            // Instagram
+            if (contact.instagram) {
+                const handle = contact.instagram.replace(/^@/, '');
+                fieldsContainer.innerHTML += createField('📷', `@${handle}`, `https://instagram.com/${handle}`);
+            }
+            
+            contactCard.classList.remove('hidden');
+        }
+
+        function createField(icon, value, href = null) {
+            const linkHtml = href 
+                ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(value)}</a>`
+                : escapeHtml(value);
+            return `
+                <div class="contact-field">
+                    <span class="icon">${icon}</span>
+                    <span class="value">${linkHtml}</span>
+                </div>
+            `;
+        }
+
+        // Batch management
+        function addToBatch() {
+            if (!parsedContact) return;
+            
+            contactsBatch.push({...parsedContact});
+            updateBatchUI();
+            showStatus('Contact added to list!', 'success');
+            
+            // Reset for next scan
+            setTimeout(() => {
+                scanAnother();
+            }, 500);
+        }
+
+        function removeFromBatch(index) {
+            contactsBatch.splice(index, 1);
+            updateBatchUI();
+        }
+
+        function clearBatch() {
+            if (contactsBatch.length === 0) return;
+            if (confirm(`Clear all ${contactsBatch.length} contacts?`)) {
+                contactsBatch = [];
+                updateBatchUI();
+            }
+        }
+
+        function updateBatchUI() {
+            batchCount.textContent = contactsBatch.length;
+            
+            if (contactsBatch.length > 0) {
+                batchSection.classList.remove('hidden');
+                
+                batchList.innerHTML = contactsBatch.map((contact, index) => {
+                    const name = [contact.first_name, contact.last_name].filter(Boolean).join(' ') || 'Unknown';
+                    const company = contact.company || '';
+                    return `
+                        <div class="batch-item">
+                            <div class="batch-item-info">
+                                <div class="batch-item-name">${escapeHtml(name)}</div>
+                                <div class="batch-item-company">${escapeHtml(company)}</div>
+                            </div>
+                            <button class="batch-item-remove" onclick="removeFromBatch(${index})">×</button>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                batchSection.classList.add('hidden');
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // CSV Export
+        function generateCSV(contacts) {
+            const headers = ['First Name', 'Last Name', 'Email', 'Phone', 'Company', 'Job Title', 'Address', 'Website', 'LinkedIn', 'Twitter', 'Instagram'];
+            
+            // Helper to normalize arrays and join with semicolon
+            const toArray = (val) => {
+                if (!val) return [];
+                if (Array.isArray(val)) return val.filter(Boolean);
+                return [val];
+            };
+            
+            const rows = contacts.map(contact => {
+                const values = [
+                    contact.first_name || '',
+                    contact.last_name || '',
+                    toArray(contact.email).join('; '),
+                    toArray(contact.phone).join('; '),
+                    contact.company || '',
+                    contact.job_title || '',
+                    contact.address || '',
+                    contact.website || '',
+                    contact.linkedin || '',
+                    contact.twitter || '',
+                    contact.instagram || ''
+                ];
+                // Escape commas, quotes, and newlines in values
+                return values.map(v => `"${String(v).replace(/"/g, '""').replace(/\n/g, ' ')}"`).join(',');
+            });
+            
+            return headers.join(',') + '\r\n' + rows.join('\r\n');
+        }
+
+        function exportCSV() {
+            if (contactsBatch.length === 0) {
+                showStatus('No contacts to export', 'error');
+                return;
+            }
+
+            const csv = generateCSV(contactsBatch);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            
+            const timestamp = new Date().toISOString().slice(0, 10);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `scanned-contacts-${timestamp}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showStatus(`Exported ${contactsBatch.length} contacts to CSV!`, 'success');
+        }
+
+        // Save contact using vCard download
+        function saveContact() {
+            if (!parsedContact) return;
+
+            const vcard = generateVCard(parsedContact);
+            const blob = new Blob([vcard], { type: 'text/vcard' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${parsedContact.first_name || 'contact'}_${parsedContact.last_name || ''}.vcf`.trim();
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showStatus('Contact file downloaded!', 'success');
+        }
+
+        function generateVCard(contact) {
+            // Helper to normalize arrays
+            const toArray = (val) => {
+                if (!val) return [];
+                if (Array.isArray(val)) return val.filter(Boolean);
+                return [val];
+            };
+            
+            const lines = [
+                'BEGIN:VCARD',
+                'VERSION:3.0',
+                `N:${contact.last_name || ''};${contact.first_name || ''};;;`,
+                `FN:${[contact.first_name, contact.last_name].filter(Boolean).join(' ')}`,
+            ];
+            
+            if (contact.company) lines.push(`ORG:${contact.company}`);
+            if (contact.job_title) lines.push(`TITLE:${contact.job_title}`);
+            
+            // Multiple emails
+            toArray(contact.email).forEach(email => {
+                lines.push(`EMAIL:${email}`);
+            });
+            
+            // Multiple phones
+            toArray(contact.phone).forEach(phone => {
+                lines.push(`TEL:${phone}`);
+            });
+            
+            if (contact.address) lines.push(`ADR:;;${contact.address};;;;`);
+            if (contact.website) lines.push(`URL:${contact.website}`);
+            
+            // Social profiles
+            if (contact.linkedin) {
+                const url = contact.linkedin.startsWith('http') ? contact.linkedin : `https://linkedin.com/in/${contact.linkedin.replace(/^@/, '')}`;
+                lines.push(`X-SOCIALPROFILE;TYPE=linkedin:${url}`);
+            }
+            if (contact.twitter) {
+                const handle = contact.twitter.replace(/^@/, '');
+                lines.push(`X-SOCIALPROFILE;TYPE=twitter:https://x.com/${handle}`);
+            }
+            if (contact.instagram) {
+                const handle = contact.instagram.replace(/^@/, '');
+                lines.push(`X-SOCIALPROFILE;TYPE=instagram:https://instagram.com/${handle}`);
+            }
+            
+            lines.push('END:VCARD');
+            return lines.join('\r\n');
+        }
+
+        // Scan another card
+        function scanAnother() {
+            retakePhoto();
+            parsedContact = null;
+        }
+
+        // Utility functions
+        function showStatus(message, type) {
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+            statusEl.classList.remove('hidden');
+        }
+
+        function hideStatus() {
+            statusEl.classList.add('hidden');
+        }
+
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        // Event listeners
+        captureBtn.addEventListener('click', capturePhoto);
+        retakeBtn.addEventListener('click', retakePhoto);
+        processBtn.addEventListener('click', processCard);
+        saveContactBtn.addEventListener('click', saveContact);
+        scanAnotherBtn.addEventListener('click', scanAnother);
+        addToBatchBtn.addEventListener('click', addToBatch);
+        clearAllBtn.addEventListener('click', clearBatch);
+        exportCsvBtn.addEventListener('click', exportCSV);
+
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(console.error);
+        }
+
+        // Initialize
+        initCamera();
+        initInstallLink();
+    </script>
+</body>
+</html>

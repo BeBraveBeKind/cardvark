@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a2e">
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
+    <title>Install Cardvark</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 540px;
+            margin: 0 auto;
+            padding: 24px 20px 40px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #888;
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-bottom: 24px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #fff;
+        }
+
+        .back-link svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .wordmark {
+            font-family: 'Bungee', cursive;
+            font-size: 1.75rem;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 16px;
+            color: #fff;
+        }
+
+        .page-subtitle {
+            color: #888;
+            font-size: 0.9375rem;
+            margin-top: 8px;
+        }
+
+        .platform-section {
+            background: #16213e;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .platform-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .platform-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .platform-icon.ios {
+            background: linear-gradient(135deg, #5856D6 0%, #AF52DE 100%);
+        }
+
+        .platform-icon.android {
+            background: linear-gradient(135deg, #34A853 0%, #0F9D58 100%);
+        }
+
+        .platform-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .steps {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .step {
+            display: flex;
+            gap: 16px;
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            background: #4a6cf7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-text {
+            font-size: 0.9375rem;
+            color: #ccc;
+            margin-bottom: 12px;
+        }
+
+        .step-text strong {
+            color: #fff;
+        }
+
+        /* Phone Mockup Styles */
+        .mockup {
+            background: #0a0a1a;
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid #333;
+        }
+
+        .mockup-screen {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            color: #000;
+        }
+
+        /* iOS Share Sheet Mockup */
+        .ios-share-sheet {
+            background: #f2f2f7;
+            padding: 16px;
+        }
+
+        .ios-share-header {
+            text-align: center;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #d1d1d6;
+        }
+
+        .ios-share-header .url {
+            font-size: 0.75rem;
+            color: #8e8e93;
+        }
+
+        .ios-share-icons {
+            display: flex;
+            gap: 16px;
+            padding: 16px 0;
+            overflow-x: auto;
+        }
+
+        .ios-share-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            min-width: 60px;
+        }
+
+        .ios-share-icon .icon-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .ios-share-icon .icon-label {
+            font-size: 0.625rem;
+            color: #000;
+            text-align: center;
+        }
+
+        .ios-action-list {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .ios-action-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e5ea;
+            font-size: 0.875rem;
+        }
+
+        .ios-action-item:last-child {
+            border-bottom: none;
+        }
+
+        .ios-action-item .action-icon {
+            width: 28px;
+            height: 28px;
+            background: #f2f2f7;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+
+        .ios-action-item.highlighted {
+            background: #e8f0fe;
+        }
+
+        .ios-action-item.highlighted .action-icon {
+            background: #4a6cf7;
+            color: #fff;
+        }
+
+        /* iOS Browser Bar */
+        .ios-browser-bar {
+            background: #f9f9f9;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e5e5ea;
+        }
+
+        .ios-url-bar {
+            flex: 1;
+            background: #e9e9eb;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 0.8125rem;
+            color: #333;
+            text-align: center;
+            margin: 0 8px;
+        }
+
+        .ios-browser-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #007aff;
+            font-size: 1.125rem;
+        }
+
+        .ios-browser-btn.share-btn {
+            background: #007aff;
+            color: #fff;
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+
+        /* Android Mockups */
+        .android-browser-bar {
+            background: #fff;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .android-url-bar {
+            flex: 1;
+            background: #f1f3f4;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.8125rem;
+            color: #5f6368;
+        }
+
+        .android-menu-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: #5f6368;
+        }
+
+        .android-menu {
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            margin: 8px;
+            overflow: hidden;
+        }
+
+        .android-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 16px;
+            font-size: 0.875rem;
+            color: #333;
+        }
+
+        .android-menu-item .menu-icon {
+            width: 20px;
+            text-align: center;
+            color: #5f6368;
+        }
+
+        .android-menu-item.highlighted {
+            background: #e8f5e9;
+        }
+
+        .android-menu-item.highlighted .menu-icon {
+            color: #34a853;
+        }
+
+        .android-menu-divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 4px 0;
+        }
+
+        /* Add to Home Screen Confirmation */
+        .ios-confirm-dialog {
+            background: #fff;
+            margin: 40px 16px;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .ios-confirm-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #e5e5ea;
+        }
+
+        .ios-confirm-header .app-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #4a6cf7 0%, #6366f1 100%);
+            border-radius: 14px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #fff;
+        }
+
+        .ios-confirm-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .ios-confirm-header .url {
+            font-size: 0.75rem;
+            color: #8e8e93;
+        }
+
+        .ios-confirm-actions {
+            display: flex;
+        }
+
+        .ios-confirm-btn {
+            flex: 1;
+            padding: 16px;
+            text-align: center;
+            font-size: 1rem;
+            color: #007aff;
+            border-right: 1px solid #e5e5ea;
+        }
+
+        .ios-confirm-btn:last-child {
+            border-right: none;
+            font-weight: 600;
+        }
+
+        /* Home Screen Result */
+        .home-screen-mockup {
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        .app-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .app-item .icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .app-item .icon.cardvark {
+            background: linear-gradient(135deg, #4a6cf7 0%, #6366f1 100%);
+            box-shadow: 0 4px 12px rgba(74, 108, 247, 0.4);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 4px 12px rgba(74, 108, 247, 0.4); }
+            50% { box-shadow: 0 4px 20px rgba(74, 108, 247, 0.7); }
+        }
+
+        .app-item .icon.placeholder {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .app-item .label {
+            font-size: 0.625rem;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .success-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8125rem;
+            color: #fff;
+            margin-top: 24px;
+        }
+
+        .success-badge .check {
+            color: #4ade80;
+        }
+
+        /* Tip box */
+        .tip-box {
+            background: #0f0f23;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 24px;
+        }
+
+        .tip-box .tip-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #4a6cf7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .tip-box p {
+            font-size: 0.875rem;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back to Cardvark
+        </a>
+
+        <header class="header">
+            <div class="wordmark">Cardvark</div>
+            <h1 class="page-title">Add to Home Screen</h1>
+            <p class="page-subtitle">Use Cardvark like a regular app—no app store needed</p>
+        </header>
+
+        <!-- iOS Section -->
+        <section class="platform-section">
+            <div class="platform-header">
+                <div class="platform-icon ios">🍎</div>
+                <h2 class="platform-name">iPhone & iPad</h2>
+            </div>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <p class="step-text">Open Cardvark in <strong>Safari</strong>, then tap the <strong>Share button</strong> (the square with an arrow pointing up)</p>
+                        <div class="mockup">
+                            <div class="mockup-screen">
+                                <div class="ios-browser-bar">
+                                    <div class="ios-browser-btn">‹</div>
+                                    <div class="ios-url-bar">cardvark.rise-above.net</div>
+                                    <div class="ios-browser-btn share-btn">↑</div>
+                                </div>
+                                <div style="height: 80px; background: #1a1a2e; display: flex; align-items: center; justify-content: center;">
+                                    <span style="font-family: 'Bungee', sans-serif; color: #fff; font-size: 1rem;">Cardvark</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <p class="step-text">Scroll down and tap <strong>"Add to Home Screen"</strong></p>
+                        <div class="mockup">
+                            <div class="mockup-screen">
+                                <div class="ios-share-sheet">
+                                    <div class="ios-share-header">
+                                        <div class="url">cardvark.rise-above.net</div>
+                                    </div>
+                                    <div class="ios-share-icons">
+                                        <div class="ios-share-icon">
+                                            <div class="icon-circle">💬</div>
+                                            <div class="icon-label">Messages</div>
+                                        </div>
+                                        <div class="ios-share-icon">
+                                            <div class="icon-circle">✉️</div>
+                                            <div class="icon-label">Mail</div>
+                                        </div>
+                                        <div class="ios-share-icon">
+                                            <div class="icon-circle">📋</div>
+                                            <div class="icon-label">Copy</div>
+                                        </div>
+                                    </div>
+                                    <div class="ios-action-list">
+                                        <div class="ios-action-item">
+                                            <div class="action-icon">📖</div>
+                                            <span>Add to Reading List</span>
+                                        </div>
+                                        <div class="ios-action-item highlighted">
+                                            <div class="action-icon">➕</div>
+                                            <span>Add to Home Screen</span>
+                                        </div>
+                                        <div class="ios-action-item">
+                                            <div class="action-icon">🔖</div>
+                                            <span>Add Bookmark</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <p class="step-text">Tap <strong>"Add"</strong> in the top right corner</p>
+                        <div class="mockup">
+                            <div class="mockup-screen" style="background: #f2f2f7;">
+                                <div class="ios-confirm-dialog">
+                                    <div class="ios-confirm-header">
+                                        <div class="app-icon">📇</div>
+                                        <h3>Cardvark</h3>
+                                        <div class="url">cardvark.rise-above.net</div>
+                                    </div>
+                                    <div class="ios-confirm-actions">
+                                        <div class="ios-confirm-btn">Cancel</div>
+                                        <div class="ios-confirm-btn">Add</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Android Section -->
+        <section class="platform-section">
+            <div class="platform-header">
+                <div class="platform-icon android">🤖</div>
+                <h2 class="platform-name">Android</h2>
+            </div>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <p class="step-text">Open Cardvark in <strong>Chrome</strong>, then tap the <strong>menu</strong> (three dots in the top right)</p>
+                        <div class="mockup">
+                            <div class="mockup-screen">
+                                <div class="android-browser-bar">
+                                    <div class="android-url-bar">cardvark.rise-above.net</div>
+                                    <div class="android-menu-btn">⋮</div>
+                                </div>
+                                <div style="height: 80px; background: #1a1a2e; display: flex; align-items: center; justify-content: center;">
+                                    <span style="font-family: 'Bungee', sans-serif; color: #fff; font-size: 1rem;">Cardvark</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <p class="step-text">Tap <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong></p>
+                        <div class="mockup">
+                            <div class="mockup-screen">
+                                <div class="android-menu">
+                                    <div class="android-menu-item">
+                                        <span class="menu-icon">⭐</span>
+                                        <span>Add to bookmarks</span>
+                                    </div>
+                                    <div class="android-menu-item highlighted">
+                                        <span class="menu-icon">📱</span>
+                                        <span>Add to Home screen</span>
+                                    </div>
+                                    <div class="android-menu-item">
+                                        <span class="menu-icon">⬇️</span>
+                                        <span>Download</span>
+                                    </div>
+                                    <div class="android-menu-divider"></div>
+                                    <div class="android-menu-item">
+                                        <span class="menu-icon">🖥️</span>
+                                        <span>Desktop site</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <p class="step-text">Tap <strong>"Add"</strong> or <strong>"Install"</strong> to confirm</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Success State -->
+        <section class="platform-section" style="padding: 0; overflow: hidden;">
+            <div class="home-screen-mockup">
+                <div class="app-grid">
+                    <div class="app-item">
+                        <div class="icon placeholder"></div>
+                        <span class="label">Photos</span>
+                    </div>
+                    <div class="app-item">
+                        <div class="icon placeholder"></div>
+                        <span class="label">Camera</span>
+                    </div>
+                    <div class="app-item">
+                        <div class="icon cardvark">📇</div>
+                        <span class="label">Cardvark</span>
+                    </div>
+                    <div class="app-item">
+                        <div class="icon placeholder"></div>
+                        <span class="label">Settings</span>
+                    </div>
+                </div>
+                <div class="success-badge">
+                    <span class="check">✓</span>
+                    Cardvark is now on your home screen
+                </div>
+            </div>
+        </section>
+
+        <div class="tip-box">
+            <div class="tip-label">Pro tip</div>
+            <p>Once installed, Cardvark opens in full-screen mode without browser bars—just like a native app.</p>
+        </div>
+    </div>
+</body>
+</html>
