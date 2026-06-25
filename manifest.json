@@ -1,11 +1,11 @@
 {
-  "name": "Business Card Scanner",
-  "short_name": "Card Scan",
-  "description": "Scan business cards and save contacts using AI",
+  "name": "Cardvark — Business Card Scanner",
+  "short_name": "Cardvark",
+  "description": "Scan business cards into contacts, instantly. A free tool by Rise Above Partners.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1a1a2e",
-  "theme_color": "#1a1a2e",
+  "background_color": "#2D3436",
+  "theme_color": "#2D3436",
   "orientation": "portrait",
   "icons": [
     {

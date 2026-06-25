@@ -6,11 +6,14 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Cardvark">
-    <meta name="theme-color" content="#1a1a2e">
+    <meta name="theme-color" content="#2D3436">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon192.png">
-    <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
-    <title>Cardvark - Business Card Scanner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://api.fontshare.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+    <title>Cardvark — Business Card Scanner by Rise Above Partners</title>
     <!-- Privacy-friendly analytics by Plausible -->
     <script async src="https://plausible.io/js/pa-jchsU-Q_v3XYNpFDkQccJ.js"></script>
     <script>
@@ -18,6 +21,28 @@
       plausible.init()
     </script>
     <style>
+        :root {
+            /* Rise Above brand tokens (dark "tool" surface) */
+            --charcoal: #2D3436;
+            --charcoal-deep: #242a2b;
+            --charcoal-light: #3D4446;
+            --signal: #6D98BA;
+            --signal-dim: #5a819f;
+            --sage: #6B8F71;
+            --sage-dim: #5a7a60;
+            --fog: #FAFAF7;
+            --smoke: #9aa0a0;
+            --hairline: rgba(250, 250, 247, 0.1);
+            --coffee: #d9a441;
+            --error: #f08a82;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --font-display: 'Outfit', -apple-system, sans-serif;
+            --font-body: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -25,9 +50,9 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #1a1a2e;
-            color: #eee;
+            font-family: var(--font-body);
+            background: var(--charcoal);
+            color: var(--fog);
             min-height: 100vh;
             min-height: 100dvh;
         }
@@ -45,35 +70,85 @@
         .header {
             text-align: center;
             margin-bottom: 20px;
+            position: relative;
+        }
+
+        .brandmark {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .brandmark .logomark {
+            width: 30px;
+            height: 30px;
+            display: block;
         }
 
         .wordmark {
-            font-family: 'Bungee', cursive;
-            font-size: 2.25rem;
-            color: #fff;
-            letter-spacing: 1px;
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 2.125rem;
+            color: var(--fog);
+            letter-spacing: -0.02em;
+            line-height: 1;
         }
 
         .subhead {
-            font-size: 0.875rem;
-            color: #888;
-            font-weight: 400;
-            margin-top: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.6875rem;
+            color: var(--smoke);
+            font-weight: 500;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+        }
+
+        .subhead .build-tag {
+            color: var(--signal);
         }
 
         .install-link {
             display: inline-block;
-            margin-top: 10px;
-            font-size: 0.8125rem;
-            color: #4a6cf7;
+            margin-top: 12px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            letter-spacing: 0.04em;
+            color: var(--signal);
             text-decoration: none;
             transition: color 0.2s;
         }
 
         .install-link:hover {
-            color: #6b8cff;
+            color: var(--fog);
             text-decoration: underline;
         }
+
+        /* About / info affordance */
+        .about-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: var(--smoke);
+            font-size: 1.25rem;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .about-btn:hover {
+            color: var(--fog);
+            background: var(--charcoal-light);
+        }
+        .about-btn:active { transform: scale(0.92); }
 
         .camera-section {
             flex: 1;
@@ -84,10 +159,11 @@
 
         .preview-container {
             position: relative;
-            background: #0f0f23;
-            border-radius: 12px;
+            background: var(--charcoal-deep);
+            border-radius: var(--radius-md);
             overflow: hidden;
             aspect-ratio: 4/3;
+            border: 1px solid var(--hairline);
         }
 
         #video, #canvas, #preview {
@@ -141,30 +217,41 @@
         .btn {
             padding: 14px 24px;
             border: none;
-            border-radius: 10px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 0.01em;
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .btn-primary {
-            background: #4a6cf7;
+            background: var(--signal);
             color: #fff;
         }
 
         .btn-primary:hover {
-            background: #3a5ce7;
+            background: var(--signal-dim);
         }
 
         .btn-secondary {
-            background: #333;
-            color: #fff;
+            background: transparent;
+            color: var(--fog);
+            box-shadow: inset 0 0 0 1px rgba(250, 250, 247, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: var(--charcoal-light);
         }
 
         .btn-success {
-            background: #22c55e;
+            background: var(--sage);
             color: #fff;
+        }
+
+        .btn-success:hover {
+            background: var(--sage-dim);
         }
 
         .btn:active:not(:disabled) {
@@ -174,6 +261,12 @@
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+
+        a.btn {
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
         }
 
         .button-row {
@@ -188,39 +281,45 @@
         .status {
             text-align: center;
             padding: 12px;
-            border-radius: 8px;
-            font-size: 0.875rem;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.8125rem;
+            letter-spacing: 0.02em;
         }
 
         .status.loading {
-            background: #16213e;
-            color: #4a6cf7;
+            background: var(--charcoal-light);
+            color: var(--signal);
         }
 
         .status.error {
-            background: #3b1219;
-            color: #f87171;
+            background: rgba(240, 138, 130, 0.12);
+            color: var(--error);
         }
 
         .status.success {
-            background: #14532d;
-            color: #4ade80;
+            background: rgba(107, 143, 113, 0.16);
+            color: #9ec7a3;
         }
 
         .contact-card {
-            background: #16213e;
-            border-radius: 12px;
+            background: var(--charcoal-light);
+            border-radius: var(--radius-md);
             padding: 20px;
             margin-top: 16px;
+            border: 1px solid var(--hairline);
         }
 
         .contact-card h2 {
-            font-size: 1.25rem;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.375rem;
+            letter-spacing: -0.01em;
             margin-bottom: 4px;
         }
 
         .contact-card .company {
-            color: #888;
+            color: var(--smoke);
             font-size: 0.875rem;
             margin-bottom: 16px;
         }
@@ -230,7 +329,7 @@
             align-items: center;
             gap: 12px;
             padding: 10px 0;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid var(--hairline);
         }
 
         .contact-field:last-child {
@@ -240,15 +339,16 @@
         .contact-field .icon {
             width: 20px;
             text-align: center;
-            color: #666;
+            color: var(--smoke);
         }
 
         .contact-field .value {
             flex: 1;
+            word-break: break-word;
         }
 
         .contact-field a {
-            color: #4a6cf7;
+            color: var(--signal);
             text-decoration: none;
         }
 
@@ -263,9 +363,9 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            background: #0f0f23;
-            border: 1px solid #333;
-            border-radius: 10px;
+            background: var(--charcoal-deep);
+            border: 1px solid var(--hairline);
+            border-radius: var(--radius-sm);
             padding: 10px 6px;
             cursor: pointer;
             transition: border-color 0.2s, background 0.2s, transform 0.1s;
@@ -275,12 +375,12 @@
 
         .action-btn:active {
             transform: scale(0.95);
-            background: #1a1a3e;
+            background: var(--charcoal-light);
         }
 
         .action-btn:hover {
-            border-color: #4a6cf7;
-            background: #1a1a3e;
+            border-color: var(--signal);
+            background: var(--charcoal-light);
         }
 
         .action-btn .action-icon {
@@ -289,8 +389,11 @@
         }
 
         .action-btn .action-label {
-            font-size: 0.6875rem;
-            color: #aaa;
+            font-family: var(--font-mono);
+            font-size: 0.625rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--smoke);
             font-weight: 500;
             white-space: nowrap;
             overflow: hidden;
@@ -305,8 +408,8 @@
         .spinner {
             width: 24px;
             height: 24px;
-            border: 3px solid #333;
-            border-top-color: #4a6cf7;
+            border: 3px solid var(--charcoal-light);
+            border-top-color: var(--signal);
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto;
@@ -317,13 +420,13 @@
         }
 
         .ocr-preview {
-            background: #0f0f23;
-            border-radius: 8px;
+            background: var(--charcoal-deep);
+            border-radius: var(--radius-sm);
             padding: 12px;
             margin-top: 12px;
-            font-family: monospace;
+            font-family: var(--font-mono);
             font-size: 0.75rem;
-            color: #888;
+            color: var(--smoke);
             max-height: 100px;
             overflow-y: auto;
             white-space: pre-wrap;
@@ -332,10 +435,11 @@
 
         /* Batch contacts section */
         .batch-section {
-            background: #16213e;
-            border-radius: 12px;
+            background: var(--charcoal-light);
+            border-radius: var(--radius-md);
             padding: 16px;
             margin-bottom: 16px;
+            border: 1px solid var(--hairline);
         }
 
         .batch-header {
@@ -346,16 +450,21 @@
         }
 
         .batch-header h3 {
-            font-size: 1rem;
-            font-weight: 600;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--smoke);
         }
 
         .batch-count {
-            background: #4a6cf7;
+            background: var(--signal);
             color: #fff;
-            padding: 4px 10px;
+            padding: 4px 11px;
             border-radius: 20px;
-            font-size: 0.875rem;
+            font-family: var(--font-mono);
+            font-size: 0.8125rem;
             font-weight: 600;
         }
 
@@ -370,8 +479,8 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 12px;
-            background: #0f0f23;
-            border-radius: 8px;
+            background: var(--charcoal-deep);
+            border-radius: var(--radius-sm);
             margin-bottom: 8px;
         }
 
@@ -393,7 +502,7 @@
 
         .batch-item-company {
             font-size: 0.75rem;
-            color: #888;
+            color: var(--smoke);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -402,7 +511,7 @@
         .batch-item-remove {
             background: none;
             border: none;
-            color: #f87171;
+            color: var(--error);
             cursor: pointer;
             padding: 4px 8px;
             font-size: 1.25rem;
@@ -431,34 +540,40 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: #ffdd00;
-            color: #000;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 0.9375rem;
-            font-weight: 600;
+            background: transparent;
+            color: var(--coffee);
+            padding: 11px 20px;
+            border-radius: var(--radius-sm);
+            box-shadow: inset 0 0 0 1px rgba(217, 164, 65, 0.4);
+            font-family: var(--font-mono);
+            font-size: 0.8125rem;
+            letter-spacing: 0.03em;
+            font-weight: 500;
             text-decoration: none;
-            transition: background 0.2s;
+            transition: background 0.2s, color 0.2s;
         }
 
         .footer-coffee:hover {
-            background: #e6c700;
+            background: rgba(217, 164, 65, 0.12);
+            color: #e8bd6c;
         }
 
         .footer-attribution {
             margin-top: 16px;
-            font-size: 0.75rem;
-            color: #666;
+            font-family: var(--font-mono);
+            font-size: 0.6875rem;
+            letter-spacing: 0.04em;
+            color: var(--smoke);
         }
 
         .footer-attribution a {
-            color: #888;
+            color: var(--signal);
             text-decoration: none;
             transition: color 0.2s;
         }
 
         .footer-attribution a:hover {
-            color: #fff;
+            color: var(--fog);
         }
 
         /* Donation Modal */
@@ -477,23 +592,24 @@
         }
 
         .modal-content {
-            background: #16213e;
-            border-radius: 16px;
-            padding: 24px;
+            background: var(--charcoal-light);
+            border-radius: var(--radius-lg);
+            padding: 28px 24px;
             max-width: 360px;
             width: 100%;
             text-align: center;
+            border: 1px solid var(--hairline);
         }
 
         .modal-content .modal-icon {
-            font-size: 2.5rem;
-            margin-bottom: 16px;
+            font-size: 2.25rem;
+            margin-bottom: 14px;
         }
 
         .modal-content p {
             font-size: 0.9375rem;
             line-height: 1.6;
-            color: #ccc;
+            color: var(--fog);
             margin-bottom: 20px;
         }
 
@@ -508,13 +624,13 @@
         }
 
         .btn-coffee {
-            background: #ffdd00;
-            color: #000;
+            background: var(--coffee);
+            color: #2a2017;
             font-weight: 700;
         }
 
         .btn-coffee:hover {
-            background: #e6c700;
+            background: #e8bd6c;
         }
 
         /* Template Picker & LinkedIn Modal */
@@ -540,8 +656,8 @@
         }
 
         .picker-content {
-            background: #16213e;
-            border-radius: 16px 16px 0 0;
+            background: var(--charcoal-light);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
             padding: 24px;
             max-width: 500px;
             width: 100%;
@@ -549,6 +665,7 @@
             overflow-y: auto;
             transform: translateY(100%);
             transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+            border-top: 1px solid var(--hairline);
         }
 
         .picker-modal.visible .picker-content {
@@ -560,27 +677,32 @@
             display: block;
             width: 36px;
             height: 4px;
-            background: #555;
+            background: var(--smoke);
+            opacity: 0.5;
             border-radius: 2px;
             margin: 0 auto 16px;
         }
 
         .picker-title {
-            font-size: 1.125rem;
-            font-weight: 600;
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
             margin-bottom: 4px;
         }
 
         .picker-subtitle {
-            font-size: 0.8125rem;
-            color: #888;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            letter-spacing: 0.02em;
+            color: var(--smoke);
             margin-bottom: 16px;
         }
 
         .template-card {
-            background: #0f0f23;
-            border: 1px solid #333;
-            border-radius: 10px;
+            background: var(--charcoal-deep);
+            border: 1px solid var(--hairline);
+            border-radius: var(--radius-sm);
             padding: 14px 16px;
             margin-bottom: 10px;
             cursor: pointer;
@@ -588,24 +710,24 @@
         }
 
         .template-card:hover {
-            border-color: #4a6cf7;
-            background: #1a1a3e;
+            border-color: var(--signal);
+            background: var(--charcoal);
         }
 
         .template-card:active {
             transform: scale(0.98);
-            background: #1a1a3e;
+            background: var(--charcoal);
         }
 
         .template-card .template-name {
-            font-weight: 600;
+            font-weight: 700;
             font-size: 0.9375rem;
             margin-bottom: 4px;
         }
 
         .template-card .template-preview {
             font-size: 0.8125rem;
-            color: #888;
+            color: var(--smoke);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -624,12 +746,12 @@
 
         .custom-template-inputs input,
         .custom-template-inputs textarea {
-            background: #0f0f23;
-            border: 1px solid #333;
-            border-radius: 8px;
+            background: var(--charcoal-deep);
+            border: 1px solid var(--hairline);
+            border-radius: var(--radius-sm);
             padding: 12px;
-            color: #eee;
-            font-family: inherit;
+            color: var(--fog);
+            font-family: var(--font-body);
             font-size: 0.875rem;
             resize: vertical;
         }
@@ -641,7 +763,7 @@
         .custom-template-inputs input:focus,
         .custom-template-inputs textarea:focus {
             outline: none;
-            border-color: #4a6cf7;
+            border-color: var(--signal);
         }
 
         .picker-cancel {
@@ -649,8 +771,10 @@
             width: 100%;
             text-align: center;
             padding: 14px;
-            color: #888;
-            font-size: 0.875rem;
+            color: var(--smoke);
+            font-family: var(--font-mono);
+            font-size: 0.8125rem;
+            letter-spacing: 0.03em;
             cursor: pointer;
             background: none;
             border: none;
@@ -658,7 +782,7 @@
         }
 
         .picker-cancel:hover {
-            color: #fff;
+            color: var(--fog);
         }
 
         /* LinkedIn button */
@@ -673,9 +797,9 @@
 
         /* Connection note copy cards */
         .note-card {
-            background: #0f0f23;
-            border: 1px solid #333;
-            border-radius: 10px;
+            background: var(--charcoal-deep);
+            border: 1px solid var(--hairline);
+            border-radius: var(--radius-sm);
             padding: 14px 16px;
             margin-bottom: 10px;
             cursor: pointer;
@@ -684,35 +808,40 @@
         }
 
         .note-card:hover {
-            border-color: #0a66c2;
-            background: #1a1a3e;
+            border-color: var(--signal);
+            background: var(--charcoal);
         }
 
         .note-card:active {
             transform: scale(0.98);
-            background: #1a1a3e;
+            background: var(--charcoal);
         }
 
         .note-card .note-label {
-            font-weight: 600;
-            font-size: 0.8125rem;
-            color: #0a66c2;
-            margin-bottom: 4px;
+            font-family: var(--font-mono);
+            font-weight: 500;
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--signal);
+            margin-bottom: 6px;
         }
 
         .note-card .note-text {
             font-size: 0.875rem;
-            color: #ccc;
-            line-height: 1.4;
+            color: var(--fog);
+            line-height: 1.45;
         }
 
         .note-card .copied-badge {
             position: absolute;
             top: 10px;
             right: 12px;
-            background: #22c55e;
+            background: var(--sage);
             color: #fff;
-            font-size: 0.6875rem;
+            font-family: var(--font-mono);
+            font-size: 0.625rem;
+            letter-spacing: 0.04em;
             padding: 2px 8px;
             border-radius: 10px;
             opacity: 0;
@@ -722,13 +851,190 @@
         .note-card .copied-badge.show {
             opacity: 1;
         }
+
+        /* Signature toggle (in email/LinkedIn pickers) */
+        .sig-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 2px 4px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .sig-toggle input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .sig-toggle .sig-box {
+            width: 38px;
+            height: 22px;
+            border-radius: 11px;
+            background: var(--charcoal-deep);
+            box-shadow: inset 0 0 0 1px var(--hairline);
+            position: relative;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .sig-toggle .sig-box::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--smoke);
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .sig-toggle input:checked + .sig-box {
+            background: var(--signal);
+            box-shadow: none;
+        }
+
+        .sig-toggle input:checked + .sig-box::after {
+            transform: translateX(16px);
+            background: #fff;
+        }
+
+        .sig-toggle .sig-label {
+            font-family: var(--font-mono);
+            font-size: 0.6875rem;
+            letter-spacing: 0.03em;
+            color: var(--smoke);
+            line-height: 1.3;
+        }
+
+        /* About sheet */
+        .about-lede {
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            color: var(--fog);
+            margin-bottom: 4px;
+        }
+
+        .about-lede strong { color: var(--fog); font-weight: 700; }
+
+        .about-eyebrow {
+            font-family: var(--font-mono);
+            font-size: 0.625rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: var(--signal);
+            margin: 22px 0 10px;
+        }
+
+        .about-link {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 13px 16px;
+            margin-bottom: 8px;
+            background: var(--charcoal-deep);
+            border: 1px solid var(--hairline);
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .about-link:hover {
+            border-color: var(--signal);
+            background: var(--charcoal);
+        }
+
+        .about-link .al-title {
+            display: block;
+            font-weight: 700;
+            font-size: 0.9375rem;
+            color: var(--fog);
+        }
+
+        .about-link .al-desc {
+            display: block;
+            font-size: 0.8125rem;
+            line-height: 1.4;
+            color: var(--smoke);
+            margin-top: 3px;
+        }
+
+        .about-link .al-arrow {
+            color: var(--signal);
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .about-foot {
+            font-family: var(--font-mono);
+            font-size: 0.6875rem;
+            letter-spacing: 0.04em;
+            color: var(--smoke);
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Post-export "next step" card */
+        #exportPrompt .modal-content { text-align: left; max-width: 380px; }
+
+        .ep-check {
+            font-family: var(--font-mono);
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--sage);
+            margin-bottom: 12px;
+        }
+
+        .ep-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.375rem;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+            color: var(--fog);
+            margin-bottom: 10px;
+        }
+
+        .ep-body {
+            font-size: 0.9375rem;
+            line-height: 1.55;
+            color: var(--smoke);
+            margin-bottom: 20px;
+        }
+
+        .ep-secondary {
+            display: block;
+            text-align: center;
+            margin-top: 14px;
+            font-family: var(--font-mono);
+            font-size: 0.8125rem;
+            letter-spacing: 0.02em;
+            color: var(--smoke);
+            text-decoration: none;
+        }
+
+        .ep-secondary:hover { color: var(--fog); }
+        .ep-dismiss { color: var(--smoke); }
     </style>
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <h1 class="wordmark">Cardvark</h1>
-            <p class="subhead">Business Card Scanner</p>
+            <button class="about-btn" id="aboutBtn" aria-label="About Cardvark and Rise Above">ⓘ</button>
+            <a class="brandmark" href="https://rise-above.net" target="_blank" rel="noopener" aria-label="Rise Above Partners">
+                <svg class="logomark" viewBox="0 0 187.5 187.5" aria-hidden="true" focusable="false">
+                    <path fill="#6d98ba" d="M184.26 103.46v3.78h-9.75l-21.35-21.45-11.95 10.52-2.83 2.5-11.15 9.81-2.83 2.49-23.2 20.43-24.52-19.15-2.99-2.33-11.92-9.32-2.98-2.33-20.2-15.77-28.88 24.07h-6.96v-3.77h5.6l30.17-25.14 22.84 17.85 2.99 2.33 11.93 9.33 2.99 2.33 21.77 17.01 20.91-18.4 2.83-2.49 11.11-9.78 2.84-2.5 14.6-12.85 22.74 22.84z"/>
+                    <path fill="#6d98ba" d="M184.26 134.58v3.77h-36.74l-23.12-27.23-2.45-2.88-19.6-23.09-23.08 24.49-2.6 2.75-24.47 25.96H2.75v-3.77h47.82l23.12-24.52 2.6-2.75 26.21-27.8 22.29 26.24 2.44 2.88 22.05 25.96z"/>
+                    <path fill="#6d98ba" d="M180.48 6.52h3.78v100.72h-3.78zM2.75 6.52h3.77v100.2H2.75zM180.48 134.58h3.78v45.9h-3.78zM2.75 134.58h6.51v45.9H2.75z"/>
+                    <path fill="#6d98ba" d="M180.48 116.73h-21.45l-17.82-20.42-2.48-2.84-36.43-41.73-40.93 43.9-2.58 2.77-17.09 18.32H2.75v3.77h40.59l18.43-19.76 2.58-2.77 37.85-40.6 33.7 38.6 2.48 2.84 18.94 21.69h26.94v-3.77z"/>
+                </svg>
+                <span class="wordmark">Cardvark</span>
+            </a>
+            <p class="subhead">Card Scanner <span class="build-tag">· A Rise Above Build</span></p>
             <a href="install.html" class="install-link" id="installLink">Add to your home screen →</a>
         </header>
 
@@ -758,7 +1064,7 @@
 
             <div id="reviewControls" class="button-row hidden">
                 <button class="btn btn-secondary" id="retakeBtn">Retake</button>
-                <button class="btn btn-primary" id="processBtn">Process Card</button>
+                <button class="btn btn-primary" id="processBtn">Read it</button>
             </div>
 
             <div id="status" class="status hidden"></div>
@@ -833,6 +1139,12 @@
                 <button class="btn btn-primary" id="sendCustomEmail">Open in Email</button>
             </div>
 
+            <label class="sig-toggle">
+                <input type="checkbox" class="sig-checkbox" checked>
+                <span class="sig-box"></span>
+                <span class="sig-label">Add Cardvark signature</span>
+            </label>
+
             <button class="picker-cancel" id="emailPickerCancel">Cancel</button>
         </div>
     </div>
@@ -859,6 +1171,12 @@
                 <span class="copied-badge">Copied!</span>
             </div>
 
+            <label class="sig-toggle">
+                <input type="checkbox" class="sig-checkbox" checked>
+                <span class="sig-box"></span>
+                <span class="sig-label">Add "via Cardvark" to notes</span>
+            </label>
+
             <button class="btn btn-linkedin" id="openLinkedIn" style="width:100%; margin-top: 12px;">Open LinkedIn</button>
             <button class="picker-cancel" id="linkedInPickerCancel">Cancel</button>
         </div>
@@ -876,6 +1194,52 @@
         </div>
     </div>
 
+    <!-- Post-export "next step" card -->
+    <div id="exportPrompt" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="ep-check" id="exportPromptCount">✓ Contacts ready</div>
+            <div class="ep-title">Now comes the real work: the follow-up.</div>
+            <div class="ep-body">A stack of cards is easy. The system that actually turns them into relationships is the hard part — that's what I build for small businesses and the towns and chambers around them.</div>
+            <div class="modal-buttons">
+                <a href="https://rise-above.net/ai-newsletter.html" target="_blank" rel="noopener" class="btn btn-primary" id="epNewsletter">Get the weekly AI brief — free</a>
+            </div>
+            <a href="https://calendar.app.google/3rfdszPynkKYkngN8" target="_blank" rel="noopener" class="ep-secondary" id="epCall">Or book a strategy call →</a>
+            <button class="picker-cancel ep-dismiss" id="epDismiss">No thanks</button>
+        </div>
+    </div>
+
+    <!-- About / Rise Above sheet -->
+    <div id="aboutPicker" class="picker-modal hidden">
+        <div class="picker-content">
+            <div class="picker-title">About Cardvark</div>
+            <div class="picker-subtitle">A free tool by Rise Above Partners</div>
+
+            <p class="about-lede">I'm Michael. I build <strong>working systems</strong> for small businesses and the towns and chambers around them. Cardvark is one of them — free to use, no account, nothing stored.</p>
+
+            <div class="about-eyebrow">More from Rise Above</div>
+
+            <a class="about-link" href="https://rise-above.net/ai-newsletter.html" target="_blank" rel="noopener">
+                <span><span class="al-title">The weekly AI brief</span><span class="al-desc">Practical AI for small business. Free, every Tuesday.</span></span>
+                <span class="al-arrow">→</span>
+            </a>
+            <a class="about-link" href="https://rise-above.net/ai-library.html" target="_blank" rel="noopener">
+                <span><span class="al-title">AI Library</span><span class="al-desc">Free training on the tools that actually help.</span></span>
+                <span class="al-arrow">→</span>
+            </a>
+            <a class="about-link" href="https://rise-above.net/advisory.html#rate" target="_blank" rel="noopener">
+                <span><span class="al-title">Strategy Sessions</span><span class="al-desc">A flat-fee 1:1 with a written plan. No retainers.</span></span>
+                <span class="al-arrow">→</span>
+            </a>
+            <a class="about-link" href="https://rise-above.net/products.html" target="_blank" rel="noopener">
+                <span><span class="al-title">The Builds</span><span class="al-desc">Switchboard, WayPoints, Town Newsletter, Grant Intelligence.</span></span>
+                <span class="al-arrow">→</span>
+            </a>
+
+            <div class="about-foot">Viroqua, Wisconsin · rise-above.net</div>
+            <button class="picker-cancel" id="aboutPickerCancel">Close</button>
+        </div>
+    </div>
+
     <script>
         // State
         let stream = null;
@@ -887,9 +1251,9 @@
         // Donation prompt config
         const donationThresholds = [2, 10, 20];
         const donationMessages = {
-            2: "Hey, nice — Cardvark just saved you some typing. This tool costs about $0.20 per scan to run. If it's useful, a quick coffee helps keep it free.",
-            10: "You're getting good use out of this! A small donation helps cover the AI costs and keeps Cardvark free for everyone.",
-            20: "Hey, I noticed you're really digging this. Did you know this costs me about $0.20 per scan? If you haven't already, I'd really appreciate a quick donation. $5 now will keep this service free for a long time."
+            2: "Glad Cardvark's saving you some typing. It's a free build from Rise Above Partners — if it's useful, a coffee helps keep it running.",
+            10: "Ten cards in — nice. Cardvark stays free for everyone, and the occasional coffee covers what it costs me to run it.",
+            20: "You're clearly putting this to work. If Cardvark's earned it, a quick coffee keeps it free and humming for the next person too."
         };
 
         // Elements
@@ -919,6 +1283,39 @@
 
         // Proxy URL
         const PROXY_URL = 'https://claude-proxy.michael-eb0.workers.dev';
+
+        // --- Outbound signature (passive referral) ---
+        const EMAIL_SIGNATURE = '\n\n— — —\nSent with Cardvark, the business card scanner by Rise Above Partners\nrise-above.net';
+        const LINKEDIN_SIGNATURE = ' — via Cardvark by Rise Above';
+        const LINKEDIN_MAX = 300;
+
+        function signatureOn() {
+            return localStorage.getItem('cardvark_signature') !== 'off';
+        }
+
+        function appendEmailSignature(body) {
+            return signatureOn() ? body + EMAIL_SIGNATURE : body;
+        }
+
+        function appendLinkedInSignature(note) {
+            // Only append if it fits within LinkedIn's connection-note limit.
+            if (!signatureOn()) return note;
+            const withSig = note + LINKEDIN_SIGNATURE;
+            return withSig.length <= LINKEDIN_MAX ? withSig : note;
+        }
+
+        // Keep the toggle checkboxes (one per picker) in sync + persisted
+        function initSignatureToggles() {
+            const boxes = document.querySelectorAll('.sig-checkbox');
+            const on = signatureOn();
+            boxes.forEach(box => {
+                box.checked = on;
+                box.addEventListener('change', () => {
+                    localStorage.setItem('cardvark_signature', box.checked ? 'on' : 'off');
+                    boxes.forEach(b => { b.checked = box.checked; });
+                });
+            });
+        }
 
         // Hide install link if already in standalone mode
         function initInstallLink() {
@@ -1002,7 +1399,7 @@
 
         // Call Claude Vision API to read business card directly
         async function parseBusinessCard(imageDataUrl) {
-            showStatus('Reading business card...', 'loading');
+            showStatus('Reading the card...', 'loading');
 
             // Extract base64 data from data URL
             const base64Data = imageDataUrl.split(',')[1];
@@ -1067,7 +1464,7 @@
                 sessionScanCount++;
                 checkDonationPrompt();
                 
-                showStatus('Contact parsed successfully!', 'success');
+                showStatus('Got it — check the details below', 'success');
             } catch (err) {
                 showStatus(err.message, 'error');
                 console.error(err);
@@ -1165,7 +1562,7 @@
             
             contactsBatch.push({...parsedContact});
             updateBatchUI();
-            showStatus('Contact added to list!', 'success');
+            showStatus('Added to your list', 'success');
             
             // Reset for next scan
             setTimeout(() => {
@@ -1267,7 +1664,10 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            showStatus(`Exported ${contactsBatch.length} contacts to CSV!`, 'success');
+            const exportedCount = contactsBatch.length;
+            showStatus(`Exported ${exportedCount} contact${exportedCount === 1 ? '' : 's'} to CSV`, 'success');
+            // Earned moment: offer the next step once per session
+            setTimeout(() => showExportPrompt(exportedCount), 600);
         }
 
         // Save contact using vCard download
@@ -1286,7 +1686,7 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            showStatus('Contact file downloaded!', 'success');
+            showStatus('Contact saved', 'success');
         }
 
         function generateVCard(contact) {
@@ -1436,18 +1836,18 @@
             const emails = Array.isArray(parsedContact.email) ? parsedContact.email.filter(Boolean) : (parsedContact.email ? [parsedContact.email] : []);
             if (emails.length === 0) return;
             const tmpl = emailTemplates[templateId];
-            openMailto(emails[0], tmpl.subject(parsedContact), tmpl.body(parsedContact));
+            openMailto(emails[0], tmpl.subject(parsedContact), appendEmailSignature(tmpl.body(parsedContact)));
             closePicker(emailPicker);
-            showStatus('Email draft opened!', 'success');
+            showStatus('Email draft opened', 'success');
         }
 
         function sendCustomEmail() {
             if (!parsedContact) return;
             const emails = Array.isArray(parsedContact.email) ? parsedContact.email.filter(Boolean) : (parsedContact.email ? [parsedContact.email] : []);
             if (emails.length === 0) return;
-            openMailto(emails[0], document.getElementById('customSubject').value, document.getElementById('customBody').value);
+            openMailto(emails[0], document.getElementById('customSubject').value, appendEmailSignature(document.getElementById('customBody').value));
             closePicker(emailPicker);
-            showStatus('Email draft opened!', 'success');
+            showStatus('Email draft opened', 'success');
         }
 
         // Template card clicks
@@ -1514,7 +1914,7 @@
         // Note card copy
         document.querySelectorAll('#linkedInPicker .note-card').forEach(card => {
             card.addEventListener('click', async () => {
-                const text = card.querySelector('.note-text').textContent;
+                const text = appendLinkedInSignature(card.querySelector('.note-text').textContent);
                 try {
                     await navigator.clipboard.writeText(text);
                 } catch (err) {
@@ -1546,6 +1946,40 @@
         document.getElementById('linkedInPickerCancel').addEventListener('click', () => closePicker(linkedInPicker));
         linkedInPicker.addEventListener('click', (e) => { if (e.target === linkedInPicker) closePicker(linkedInPicker); });
 
+        // --- About / Rise Above sheet ---
+        const aboutPicker = document.getElementById('aboutPicker');
+        document.getElementById('aboutBtn').addEventListener('click', () => {
+            if (window.plausible) plausible('About Opened');
+            openPicker(aboutPicker);
+        });
+        document.getElementById('aboutPickerCancel').addEventListener('click', () => closePicker(aboutPicker));
+        aboutPicker.addEventListener('click', (e) => { if (e.target === aboutPicker) closePicker(aboutPicker); });
+        // Track outbound clicks within the About sheet
+        aboutPicker.querySelectorAll('.about-link').forEach(a => {
+            a.addEventListener('click', () => {
+                if (window.plausible) plausible('About Link', { props: { to: a.querySelector('.al-title')?.textContent || a.href } });
+            });
+        });
+
+        // --- Post-export "next step" prompt (value-first, once per session) ---
+        const exportPrompt = document.getElementById('exportPrompt');
+        function showExportPrompt(count) {
+            if (sessionStorage.getItem('cardvark_export_prompt') === 'shown') return;
+            sessionStorage.setItem('cardvark_export_prompt', 'shown');
+            document.getElementById('exportPromptCount').textContent = `✓ ${count} contact${count === 1 ? '' : 's'} ready to follow up`;
+            exportPrompt.classList.remove('hidden');
+            if (window.plausible) plausible('Export Prompt Shown');
+        }
+        function hideExportPrompt() { exportPrompt.classList.add('hidden'); }
+        document.getElementById('epDismiss').addEventListener('click', hideExportPrompt);
+        exportPrompt.addEventListener('click', (e) => { if (e.target === exportPrompt) hideExportPrompt(); });
+        document.getElementById('epNewsletter').addEventListener('click', () => {
+            if (window.plausible) plausible('Export Prompt CTA', { props: { cta: 'newsletter' } });
+        });
+        document.getElementById('epCall').addEventListener('click', () => {
+            if (window.plausible) plausible('Export Prompt CTA', { props: { cta: 'call' } });
+        });
+
         // Event listeners
         captureBtn.addEventListener('click', capturePhoto);
         retakeBtn.addEventListener('click', retakePhoto);
@@ -1566,6 +2000,7 @@
         // Initialize
         initCamera();
         initInstallLink();
+        initSignatureToggles();
     </script>
 </body>
 </html>
