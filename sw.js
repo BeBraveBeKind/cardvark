@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardvark-v7';
+const CACHE_NAME = 'cardvark-v8';
 const ASSETS = [
   '/',
   '/index.html',
@@ -15,18 +15,30 @@ self.addEventListener('install', event => {
 
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(
+    caches.keys()
+      .then(keys => Promise.all(
         keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-      );
-    })
+      ))
+      // Take control of already-open pages immediately so the update applies
+      // without requiring every tab/PWA window to be closed first.
+      .then(() => self.clients.claim())
   );
 });
 
+// Network-first for GET requests: always serve fresh content when online, fall
+// back to cache only when offline. A cache-first strategy used to mask deploys
+// (e.g. a fixed model ID) by serving a stale index.html indefinitely. Non-GET
+// requests (the Claude API proxy POST) are left to the network untouched.
 self.addEventListener('fetch', event => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
-    })
+    fetch(req)
+      .then(res => {
+        const copy = res.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(req, copy)).catch(() => {});
+        return res;
+      })
+      .catch(() => caches.match(req))
   );
 });
