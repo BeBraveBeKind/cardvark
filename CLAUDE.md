@@ -41,8 +41,10 @@ To test PWA features (service worker, manifest), serve over HTTPS or use localho
 
 ## Project Phase
 
-**Updated:** 2026-04-05
+**Updated:** 2026-06-24
 - Features shipped: camera scan, vCard, CSV export, batch mode, email follow-up templates, LinkedIn connect, donation prompts
 - Deployment: Netlify connected to GitHub (BeBraveBeKind/cardvark), auto-deploy on push
+- **2026-06-24 hotfix:** model `claude-sonnet-4-20250514` was retired 2026-06-15 → scans 404'd. Swapped to `claude-sonnet-4-6` (verified live). Also fixed the service worker — it was cache-first (served a stale `index.html`, masking the deploy) → now **network-first + clients.claim, cache v8**.
 - Awaiting: mobile device testing, Netlify GitHub OAuth completion
 - Next: Conference Mode (B2B), Smart Contact Card (QR share), usage analytics
+- Model retirements are now monitored automatically by **model-watch** (`~/Scripts/model-watch/`).
