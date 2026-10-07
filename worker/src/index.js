@@ -5,6 +5,7 @@ const ALLOWED_ORIGINS = new Set(['https://cardvark.rise-above.net']);
 const MODEL = 'claude-sonnet-4-6';
 const MAX_TOKENS = 1024;
 const MAX_IMAGE_CHARS = 7_000_000; // base64 of a ~5 MB image, Anthropic's per-image limit
+const MAX_BODY_BYTES = 8_000_000;
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
 const PROMPT = `Extract contact information from this business card image. Return ONLY a valid JSON object with these exact keys (use null for missing fields, use arrays for email and phone even if there's only one):
@@ -16,6 +17,7 @@ function cors(origin) {
     'Access-Control-Allow-Origin': origin,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Max-Age': '86400',
     Vary: 'Origin',
   };
 }
@@ -28,9 +30,16 @@ function fail(status, message, headers) {
   });
 }
 
+// IPv6 clients can rotate addresses inside their /64, so limit by the /64.
+function clientKey(request) {
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  if (!ip.includes(':')) return ip;
+  return ip.split(':').slice(0, 4).join(':');
+}
+
 function findImage(body) {
   const msgs = body && Array.isArray(body.messages) ? body.messages : [];
-  if (msgs.length !== 1 || !Array.isArray(msgs[0].content)) return null;
+  if (msgs.length !== 1 || !msgs[0] || !Array.isArray(msgs[0].content)) return null;
   const images = msgs[0].content.filter((c) => c && c.type === 'image');
   if (images.length !== 1) return null;
   const src = images[0].source || {};
@@ -48,11 +57,13 @@ export default {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers });
     if (request.method !== 'POST') return fail(405, 'Method not allowed', headers);
 
-    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-    if (env.SCAN_LIMITER) {
-      const { success } = await env.SCAN_LIMITER.limit({ key: ip });
-      if (!success) return fail(429, 'Too many scans in a minute. Wait a moment and try again.', headers);
-    }
+    // Without the limiter there is no spend ceiling, so refuse rather than run open.
+    if (!env.SCAN_LIMITER) return fail(500, 'Scanner is not configured', headers);
+    const { success } = await env.SCAN_LIMITER.limit({ key: clientKey(request) });
+    if (!success) return fail(429, 'Too many scans in a minute. Wait a moment and try again.', headers);
+
+    const length = Number(request.headers.get('Content-Length') || 0);
+    if (length > MAX_BODY_BYTES) return fail(413, 'That photo is too large. Try again with a smaller one.', headers);
 
     if (!env.CLAUDE_API_KEY) return fail(500, 'Scanner is not configured', headers);
 
