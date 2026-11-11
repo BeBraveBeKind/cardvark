@@ -553,7 +553,7 @@
         .detail-manage { display: flex; justify-content: space-between; }
 
         /* ---------- Contacts list ---------- */
-        .list-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+        .list-head { display: flex; flex-direction: column; gap: 6px; }
 
         .contact-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
 
@@ -1090,18 +1090,18 @@
                 <div class="actionbar">
                     <div class="actionbar-inner">
                         <button class="btn btn-secondary" id="discardBtn" type="button">Discard</button>
-                        <button class="btn btn-success btn-grow" id="saveBtn" type="submit" form="reviewForm">Save contact</button>
+                        <button class="btn btn-success btn-grow" id="saveBtn" type="submit" form="reviewForm">Save to Cardvark list</button>
                     </div>
                 </div>
             </section>
 
             <!-- ========== CONTACT DETAIL ========== -->
             <section id="viewDetail" class="view has-actionbar" aria-labelledby="detailName" hidden>
-                <button class="text-link back-link" id="backToContacts">‹ All contacts</button>
+                <button class="text-link back-link" id="backToContacts">‹ Cardvark list</button>
 
                 <div class="saved-banner" id="savedBanner" role="status" hidden>
                     <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg>
-                    <span>Saved to your contacts</span>
+                    <span>Saved to your Cardvark list</span>
                 </div>
 
                 <div class="contact-card">
@@ -1136,7 +1136,7 @@
 
                 <div class="detail-manage">
                     <button class="btn btn-quiet" id="editBtn">Edit details</button>
-                    <button class="btn btn-danger" id="deleteBtn">Delete</button>
+                    <button class="btn btn-danger" id="deleteBtn">Remove from list</button>
                 </div>
 
                 <div class="actionbar">
@@ -1152,13 +1152,13 @@
             <!-- ========== CONTACTS ========== -->
             <section id="viewContacts" class="view has-tabbar" aria-labelledby="contactsTitle" hidden>
                 <div class="list-head">
-                    <h1 id="contactsTitle" class="view-title" tabindex="-1">Contacts</h1>
+                    <h1 id="contactsTitle" class="view-title" tabindex="-1">Your Cardvark list</h1>
                     <span class="eyebrow" id="contactsSummary"></span>
                 </div>
 
                 <div class="empty-state" id="emptyState">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-card"/></svg>
-                    <p>No contacts yet. Scan a card and it will show up here, ready to follow up.</p>
+                    <p>Your list is empty. Scan a card and it will show up here, ready to follow up.</p>
                     <button class="btn btn-primary" id="emptyScanBtn">Scan a card</button>
                 </div>
 
@@ -1166,8 +1166,8 @@
 
                 <div class="export-block" id="exportBlock">
                     <button class="btn btn-success btn-block" id="exportCsvBtn">Export all as CSV</button>
-                    <p class="fine-print">The CSV imports into HubSpot, Salesforce, Pipedrive and most other CRMs.<br>Contacts stay on this device until you clear them.</p>
-                    <button class="btn btn-danger" id="clearAllBtn" style="align-self:center;">Clear all contacts</button>
+                    <p class="fine-print">The CSV imports into HubSpot, Salesforce, Pipedrive and most other CRMs.<br>Your list stays on this device until you clear it. It is separate from your phone's contacts.</p>
+                    <button class="btn btn-danger" id="clearAllBtn" style="align-self:center;">Clear the list</button>
                 </div>
 
                 <div class="list-footer">
@@ -1185,7 +1185,7 @@
                 </button>
                 <button class="tab" id="tabContacts">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-list"/></svg>
-                    <span>Contacts</span>
+                    <span>My list</span>
                     <span class="tab-badge" id="tabBadge" hidden></span>
                 </button>
             </div>
@@ -1289,7 +1289,7 @@
         <div class="modal-content">
             <p id="confirmMessage"></p>
             <div class="modal-buttons">
-                <button class="btn btn-secondary" id="confirmYes" style="color:var(--error);">Clear all</button>
+                <button class="btn btn-secondary" id="confirmYes" style="color:var(--error);">Clear the list</button>
                 <button class="btn btn-primary" id="confirmNo">Keep them</button>
             </div>
         </div>
@@ -1315,7 +1315,7 @@
             <div class="picker-title" id="aboutTitle" tabindex="-1">About Cardvark</div>
             <div class="picker-subtitle">A free tool by Rise Above Partners</div>
 
-            <p class="about-lede">I'm Michael. I build <strong>working systems</strong> for small businesses and the towns and chambers around them. Cardvark is one of them — free to use, no account. Your contacts stay on this device, and Cardvark doesn't keep your card photos.</p>
+            <p class="about-lede">I'm Michael. I build <strong>working systems</strong> for small businesses and the towns and chambers around them. Cardvark is one of them — free to use, no account. Your scanned list stays on this device, and Cardvark doesn't keep your card photos.</p>
 
             <div class="about-eyebrow">More from Rise Above</div>
 
@@ -1764,7 +1764,7 @@
             $('reviewSub').textContent = draft.isNew
                 ? 'Fix anything the scan got wrong, then save.'
                 : 'Changes apply to this contact everywhere in Cardvark.';
-            $('saveBtn').textContent = draft.isNew ? 'Save contact' : 'Save changes';
+            $('saveBtn').textContent = draft.isNew ? 'Save to Cardvark list' : 'Save changes';
             $('discardBtn').textContent = draft.isNew ? 'Discard' : 'Cancel';
 
             const photo = $('reviewPhoto');
@@ -1895,7 +1895,7 @@
             $('emailBtn').hidden = toArray(c.email).length === 0;
             $('followedToggle').checked = Boolean(c.followedUp);
             $('savedBanner').hidden = !opts.justSaved;
-            $('backToContacts').textContent = `‹ All contacts (${contacts.length})`;
+            $('backToContacts').textContent = `‹ Cardvark list (${contacts.length})`;
 
             showView('detail', opts);
         }
@@ -1916,7 +1916,7 @@
             persist();
             activeId = null;
             openContacts({ replace: true });
-            showToast(`Deleted ${displayName(removed)}`, 'Undo', () => {
+            showToast(`Removed ${displayName(removed)} from your list`, 'Undo', () => {
                 contacts.splice(Math.min(index, contacts.length), 0, removed);
                 persist();
                 renderContacts();
@@ -1928,7 +1928,7 @@
             const badge = $('tabBadge');
             badge.hidden = contacts.length === 0;
             badge.textContent = contacts.length;
-            badge.setAttribute('aria-label', `${contacts.length} saved`);
+            badge.setAttribute('aria-label', `${contacts.length} in your list`);
         }
 
         function renderContacts() {
@@ -1967,7 +1967,7 @@
         });
 
         function confirmClear() {
-            $('confirmMessage').textContent = `Clear all ${contacts.length} contact${contacts.length === 1 ? '' : 's'} from this device? Export first if you still need them.`;
+            $('confirmMessage').textContent = `Clear all ${contacts.length} card${contacts.length === 1 ? '' : 's'} from your Cardvark list? Your phone's contacts aren't affected. Export first if you still need them.`;
             $('confirmModal').classList.remove('hidden');
             $('confirmNo').focus();
         }
@@ -1979,7 +1979,7 @@
             persist();
             $('confirmModal').classList.add('hidden');
             renderContacts();
-            showToast('All contacts cleared', 'Undo', () => {
+            showToast('Cardvark list cleared', 'Undo', () => {
                 contacts = backup;
                 persist();
                 renderContacts();
@@ -2057,7 +2057,7 @@
             if (!c) return;
             const base = (fullName(c) || c.company || 'contact').replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '_') || 'contact';
             downloadBlob(new Blob([generateVCard(c)], { type: 'text/vcard' }), `${base}.vcf`);
-            showToast('Contact file ready. Open it to add to your phone.');
+            showToast("Contact file ready. Open it to add to your phone's contacts.");
         }
 
         // ---------- Bottom sheets ----------

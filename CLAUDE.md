@@ -16,7 +16,8 @@ Cardvark is a Progressive Web App that scans business cards via phone camera and
 ## Key Details
 
 - **API proxy**: All Claude API calls go through a Cloudflare Worker at `claude-proxy.michael-eb0.workers.dev`. The app sends base64 JPEG images to Claude Sonnet for structured JSON extraction.
-- **No server/database**: Saved contacts live in `localStorage` (`cardvark_contacts`) on the user's device, so a reload or a trip to the mail app can't lose a batch. Card photos are never stored. Public copy says "contacts stay on this device", not "nothing stored".
+- **No server/database**: Saved contacts live in `localStorage` (`cardvark_contacts`) on the user's device, so a reload or a trip to the mail app can't lose a batch. Card photos are never stored. Public copy says "your scanned list stays on this device", not "nothing stored".
+- **Naming**: the saved collection is always "your Cardvark list" / "My list" in the UI, never "contacts", so it can't be mistaken for the phone's address book. "Contacts" is reserved for the phone ("Add to phone", "your phone's contacts").
 - **Proxy origin lock**: the Worker only accepts requests from `https://cardvark.rise-above.net`, so scans fail on localhost and Netlify deploy previews. Append `?demo` to the URL to get a sample card back instead of calling the API.
 - **Deployment**: Static files on Netlify via GitHub (BeBraveBeKind/cardvark). Push to `main` auto-deploys to `cardvark.rise-above.net`. No build command.
 - **Branding**: Rise Above Partners tokens in `:root` (charcoal `#2D3436`, signal `#6D98BA`, sage `#6B8F71`; Outfit / Satoshi / IBM Plex Mono). Filled buttons use dark `--ink` text and small text uses `--signal-text` / `--smoke` so everything passes WCAG AA contrast — keep that when adding UI.
@@ -34,7 +35,7 @@ To test PWA features (service worker, manifest), serve over HTTPS or use localho
 ## When Editing
 
 - All app logic is inline in `index.html` `<script>` tag — there are no external JS files.
-- When changing cached assets, increment the `CACHE_NAME` version in `sw.js` (currently `cardvark-v10`).
+- When changing cached assets, increment the `CACHE_NAME` version in `sw.js` (currently `cardvark-v11`).
 - The Claude Vision API prompt (in `parseBusinessCard()`, mirrored in `worker/src/index.js`) defines the JSON schema for extracted contacts. Changes there affect `normalizeContact()`, the review form, vCard, and CSV logic.
 - Follow-up actions work on `activeContact()` (a saved contact), never on an unsaved scan. Keep it that way: saving comes first.
 - Tap targets are at least 44px and inputs are 16px (prevents iOS zoom). Don't re-add `user-scalable=no`.
