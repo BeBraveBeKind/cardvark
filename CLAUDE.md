@@ -35,8 +35,10 @@ To test PWA features (service worker, manifest), serve over HTTPS or use localho
 ## When Editing
 
 - All app logic is inline in `index.html` `<script>` tag — there are no external JS files.
-- When changing cached assets, increment the `CACHE_NAME` version in `sw.js` (currently `cardvark-v11`).
+- When changing cached assets, increment the `CACHE_NAME` version in `sw.js` (currently `cardvark-v12`).
 - The Claude Vision API prompt (in `parseBusinessCard()`, mirrored in `worker/src/index.js`) defines the JSON schema for extracted contacts. Changes there affect `normalizeContact()`, the review form, vCard, and CSV logic.
+- Saving a new scan runs `findDuplicate()` (same email, same phone, or same name + company). A match opens a dialog: update the existing entry (`mergeInto()`, blanks never erase saved values) or save separately.
+- Contacts carry a free-text `note` (user-entered, not from the scan); it flows to the detail screen, CSV (`Notes`) and vCard (`NOTE`).
 - Follow-up actions work on `activeContact()` (a saved contact), never on an unsaved scan. Keep it that way: saving comes first.
 - Tap targets are at least 44px and inputs are 16px (prevents iOS zoom). Don't re-add `user-scalable=no`.
 - Navigation uses `history.pushState`, so the phone's back button moves between screens.

@@ -483,6 +483,17 @@
 
         .contact-field svg { width: 18px; height: 18px; color: var(--smoke); flex-shrink: 0; }
         .contact-field .value { flex: 1; word-break: break-word; }
+        .contact-field.is-note { align-items: flex-start; }
+        .contact-field.is-note svg { margin-top: 3px; }
+        .contact-field.is-note .value { white-space: pre-wrap; }
+
+        .dup-notice {
+            background: rgba(217, 164, 65, 0.14);
+            color: #edc77a;
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            font-size: 0.9375rem;
+        }
         .contact-field a { color: var(--signal-text); text-decoration: none; }
 
         .action-grid { display: flex; gap: 10px; }
@@ -961,6 +972,7 @@
             <g id="i-check" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.500l4.500 4.500L19 7.500"/></g>
             <g id="i-chevron" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></g>
             <g id="i-info" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.500v.100"/></g>
+            <g id="i-note" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.500h9l4 4V20a.500.500 0 0 1-.500.500h-12.500a.500.500 0 0 1-.500-.500V4a.500.500 0 0 1 .500-.500z"/><path d="M9 11h6M9 15h4"/></g>
             <g id="i-card" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.500" y="5" width="19" height="14" rx="2"/><circle cx="8" cy="11" r="2"/><path d="M5 16c.500-1.500 1.600-2.200 3-2.200s2.500.700 3 2.200M14 10h4.500M14 14h3"/></g>
         </defs>
     </svg>
@@ -1034,6 +1046,8 @@
                     <p class="view-sub" id="reviewSub">Fix anything the scan got wrong, then save.</p>
                 </div>
 
+                <div class="dup-notice" id="dupNotice" role="status" hidden></div>
+
                 <img id="reviewPhoto" class="review-photo" alt="The card you scanned" hidden>
 
                 <form id="reviewForm" class="form-grid" novalidate>
@@ -1057,6 +1071,10 @@
                     </div>
                     <div id="emailFields" class="form-grid"></div>
                     <div id="phoneFields" class="form-grid"></div>
+                    <div class="field">
+                        <label for="f_note">Note</label>
+                        <textarea id="f_note" name="note" rows="2" placeholder="Where you met, what to follow up on"></textarea>
+                    </div>
 
                     <details class="more-fields" id="moreFields">
                         <summary>Website, address and social</summary>
@@ -1101,7 +1119,7 @@
 
                 <div class="saved-banner" id="savedBanner" role="status" hidden>
                     <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg>
-                    <span>Saved to your Cardvark list</span>
+                    <span id="savedBannerText">Saved to your Cardvark list</span>
                 </div>
 
                 <div class="contact-card">
@@ -1295,6 +1313,18 @@
         </div>
     </div>
 
+    <!-- Duplicate dialog -->
+    <div id="dupModal" class="modal-overlay hidden" role="alertdialog" aria-modal="true" aria-labelledby="dupMessage">
+        <div class="modal-content">
+            <p id="dupMessage"></p>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" id="dupUpdate">Update the existing entry</button>
+                <button class="btn btn-secondary" id="dupSeparate">Save as a separate entry</button>
+                <button class="btn btn-quiet" id="dupBack">Go back</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Post-export "next step" card -->
     <div id="exportPrompt" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="epTitle">
         <div class="modal-content">
@@ -1418,12 +1448,46 @@
                 website: str(raw.website),
                 linkedin: str(raw.linkedin),
                 twitter: str(raw.twitter),
-                instagram: str(raw.instagram)
+                instagram: str(raw.instagram),
+                note: str(raw.note)
             };
         }
 
         function hasAnyDetail(c) {
             return Boolean(c.first_name || c.last_name || c.company || c.email.length || c.phone.length);
+        }
+
+        // ---------- Duplicate detection ----------
+        function phoneKey(phone) {
+            const digits = String(phone).replace(/\D/g, '');
+            return digits.length >= 7 ? digits.slice(-10) : '';
+        }
+
+        // Same email, same phone, or same name at the same company
+        function findDuplicate(c) {
+            const emails = c.email.map(e => e.toLowerCase());
+            const phones = c.phone.map(phoneKey).filter(Boolean);
+            const name = fullName(c).toLowerCase();
+            const company = c.company.toLowerCase();
+            return contacts.find(o => {
+                if (toArray(o.email).some(e => emails.includes(e.toLowerCase()))) return true;
+                if (toArray(o.phone).map(phoneKey).some(p => p && phones.includes(p))) return true;
+                return Boolean(name && company && fullName(o).toLowerCase() === name && str(o.company).toLowerCase() === company);
+            }) || null;
+        }
+
+        // Newly reviewed values win; blanks never erase what was already saved
+        function mergeInto(existing, data) {
+            ['first_name', 'last_name', 'company', 'job_title', 'address', 'website', 'linkedin', 'twitter', 'instagram']
+                .forEach(key => { if (data[key]) existing[key] = data[key]; });
+            const union = (a, b, keyFn) => {
+                const seen = new Set();
+                return [...b, ...a].filter(v => { const k = keyFn(v) || v; if (seen.has(k)) return false; seen.add(k); return true; });
+            };
+            existing.email = union(toArray(existing.email), data.email, v => v.toLowerCase());
+            existing.phone = union(toArray(existing.phone), data.phone, phoneKey);
+            const oldNote = str(existing.note);
+            if (data.note && !oldNote.includes(data.note)) existing.note = oldNote ? `${oldNote}\n${data.note}` : data.note;
         }
 
         // ---------- Storage (this device only) ----------
@@ -1771,8 +1835,13 @@
             if (draft.image) { photo.src = draft.image; photo.hidden = false; }
             else { photo.removeAttribute('src'); photo.hidden = true; }
 
-            ['first_name', 'last_name', 'job_title', 'company', 'website', 'address', 'linkedin', 'twitter', 'instagram']
+            ['first_name', 'last_name', 'job_title', 'company', 'website', 'address', 'linkedin', 'twitter', 'instagram', 'note']
                 .forEach(key => { $('f_' + key).value = c[key] || ''; });
+
+            // Say so up front if this card is already in the list
+            const existing = draft.isNew ? findDuplicate(c) : null;
+            $('dupNotice').hidden = !existing;
+            if (existing) $('dupNotice').textContent = `${displayName(existing)} is already in your Cardvark list. Saving will ask whether to update that entry.`;
             $('emailFields').innerHTML = multiFieldHtml('email', 'Email', c.email);
             $('phoneFields').innerHTML = multiFieldHtml('phone', 'Phone', c.phone);
             $('moreFields').open = Boolean(c.website || c.address || c.linkedin || c.twitter || c.instagram);
@@ -1790,7 +1859,8 @@
                 job_title: get('job_title'), company: get('company'),
                 email: multi('email'), phone: multi('phone'),
                 website: get('website'), address: get('address'),
-                linkedin: get('linkedin'), twitter: get('twitter'), instagram: get('instagram')
+                linkedin: get('linkedin'), twitter: get('twitter'), instagram: get('instagram'),
+                note: get('note')
             });
         }
 
@@ -1821,30 +1891,64 @@
             }
             error.hidden = true;
 
-            let id;
-            if (draft.isNew) {
-                id = `c_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-                contacts.unshift({ id, createdAt: Date.now(), followedUp: false, ...data });
-            } else {
-                id = draft.id;
-                const existing = findContact(id);
+            if (!draft.isNew) {
+                const existing = findContact(draft.id);
                 if (existing) Object.assign(existing, data);
-            }
-            persist();
-
-            const wasNew = draft.isNew;
-            draft = null;
-            if (wasNew) {
-                resetScan();
-                // Replace the review screen in history so Back doesn't return to a stale form
-                openDetail(id, { justSaved: true, replace: true });
-                maybeShowDonation();
-            } else {
+                persist();
+                draft = null;
                 // Editing sits on top of the contact screen: step back to it (re-rendered by popstate)
                 history.back();
                 showToast('Changes saved');
+                return;
             }
+
+            const duplicate = findDuplicate(data);
+            if (duplicate) {
+                pendingSave = { data, duplicateId: duplicate.id };
+                $('dupMessage').textContent = `${displayName(duplicate)} is already in your Cardvark list. Update that entry with these details, or keep both?`;
+                $('dupModal').classList.remove('hidden');
+                $('dupUpdate').focus();
+                return;
+            }
+            finishNewSave(data, null);
         }
+
+        let pendingSave = null;
+
+        function finishNewSave(data, mergeTargetId) {
+            let id;
+            const target = mergeTargetId ? findContact(mergeTargetId) : null;
+            if (target) {
+                mergeInto(target, data);
+                id = target.id;
+                // Move the refreshed entry to the top, where a new scan would land
+                contacts = [target, ...contacts.filter(c => c !== target)];
+            } else {
+                id = `c_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+                contacts.unshift({ id, createdAt: Date.now(), followedUp: false, ...data });
+            }
+            persist();
+            draft = null;
+            pendingSave = null;
+            resetScan();
+            // Replace the review screen in history so Back doesn't return to a stale form
+            openDetail(id, { justSaved: true, merged: Boolean(target), replace: true });
+            maybeShowDonation();
+        }
+
+        $('dupUpdate').addEventListener('click', () => {
+            $('dupModal').classList.add('hidden');
+            if (pendingSave) finishNewSave(pendingSave.data, pendingSave.duplicateId);
+        });
+        $('dupSeparate').addEventListener('click', () => {
+            $('dupModal').classList.add('hidden');
+            if (pendingSave) finishNewSave(pendingSave.data, null);
+        });
+        $('dupBack').addEventListener('click', () => {
+            $('dupModal').classList.add('hidden');
+            pendingSave = null;
+            $('saveBtn').focus();
+        });
 
         function discardReview() {
             if (!draft) return;
@@ -1890,11 +1994,13 @@
             if (c.linkedin) html += fieldRow('linkedin', c.linkedin, linkedInProfileUrl(c.linkedin));
             if (c.twitter) { const h = c.twitter.replace(/^@/, ''); html += fieldRow('link', `@${h} on X`, `https://x.com/${h}`); }
             if (c.instagram) { const h = c.instagram.replace(/^@/, ''); html += fieldRow('link', `@${h} on Instagram`, `https://instagram.com/${h}`); }
+            if (c.note) html += `<div class="contact-field is-note">${icon('note')}<span class="value">${escapeHtml(c.note)}</span></div>`;
             $('detailFields').innerHTML = html;
 
             $('emailBtn').hidden = toArray(c.email).length === 0;
             $('followedToggle').checked = Boolean(c.followedUp);
             $('savedBanner').hidden = !opts.justSaved;
+            $('savedBannerText').textContent = opts.merged ? 'Updated in your Cardvark list' : 'Saved to your Cardvark list';
             $('backToContacts').textContent = `‹ Cardvark list (${contacts.length})`;
 
             showView('detail', opts);
@@ -1989,7 +2095,7 @@
         // ---------- CSV export ----------
         function generateCSV(list) {
             // First email/phone get their own column so CRM importers accept the row as-is
-            const headers = ['First Name', 'Last Name', 'Email', 'Phone', 'Company', 'Job Title', 'Address', 'Website', 'LinkedIn', 'Twitter', 'Instagram', 'Other Emails', 'Other Phones', 'Followed Up'];
+            const headers = ['First Name', 'Last Name', 'Email', 'Phone', 'Company', 'Job Title', 'Address', 'Website', 'LinkedIn', 'Twitter', 'Instagram', 'Other Emails', 'Other Phones', 'Followed Up', 'Notes'];
             const rows = list.map(c => {
                 const emails = toArray(c.email);
                 const phones = toArray(c.phone);
@@ -1999,7 +2105,8 @@
                     c.company || '', c.job_title || '', c.address || '', c.website || '',
                     c.linkedin || '', c.twitter || '', c.instagram || '',
                     emails.slice(1).join('; '), phones.slice(1).join('; '),
-                    c.followedUp ? 'Yes' : 'No'
+                    c.followedUp ? 'Yes' : 'No',
+                    c.note || ''
                 ];
                 return values.map(v => `"${String(v).replace(/"/g, '""').replace(/\n/g, ' ')}"`).join(',');
             });
@@ -2048,6 +2155,7 @@
             if (contact.linkedin) lines.push(`X-SOCIALPROFILE;TYPE=linkedin:${linkedInProfileUrl(contact.linkedin)}`);
             if (contact.twitter) lines.push(`X-SOCIALPROFILE;TYPE=twitter:https://x.com/${contact.twitter.replace(/^@/, '')}`);
             if (contact.instagram) lines.push(`X-SOCIALPROFILE;TYPE=instagram:https://instagram.com/${contact.instagram.replace(/^@/, '')}`);
+            if (contact.note) lines.push(`NOTE:${vEsc(contact.note)}`);
             lines.push('END:VCARD');
             return lines.join('\r\n');
         }
@@ -2299,6 +2407,8 @@
             const message = pendingDonation;
             pendingDonation = null;
             setTimeout(() => {
+                // Never land on top of a card being checked: hold it for the next save instead
+                if (currentView === 'review') { pendingDonation = message; return; }
                 $('donationMessage').textContent = message;
                 donationModal.classList.remove('hidden');
                 $('dismissDonation').focus();
