@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Cardvark">
     <meta name="theme-color" content="#2D3436">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://api.fontshare.com">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -27,27 +27,31 @@
             --charcoal-deep: #242a2b;
             --charcoal-light: #3D4446;
             --signal: #6D98BA;
-            --signal-dim: #5a819f;
+            --signal-dim: #86abc8;
+            --signal-text: #9cc0dc;      /* signal, lightened so small text passes contrast */
             --sage: #6B8F71;
-            --sage-dim: #5a7a60;
+            --sage-dim: #7fa285;
+            --sage-text: #a6cfab;
             --fog: #FAFAF7;
-            --smoke: #9aa0a0;
-            --hairline: rgba(250, 250, 247, 0.1);
+            --smoke: #b7bdbd;            /* secondary text; passes AA on every surface */
+            --ink: #14191a;              /* text on signal / sage / coffee fills */
+            --hairline: rgba(250, 250, 247, 0.12);
+            --field-line: rgba(250, 250, 247, 0.28);
             --coffee: #d9a441;
-            --error: #f08a82;
+            --error: #f5a199;
             --radius-lg: 20px;
             --radius-md: 12px;
             --radius-sm: 8px;
+            --tabbar-h: 64px;
+            --safe-b: env(safe-area-inset-bottom, 0px);
             --font-display: 'Outfit', -apple-system, sans-serif;
             --font-body: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { -webkit-text-size-adjust: 100%; }
 
         body {
             font-family: var(--font-body);
@@ -55,108 +59,175 @@
             color: var(--fog);
             min-height: 100vh;
             min-height: 100dvh;
+            line-height: 1.4;
         }
 
-        .container {
+        button, input, textarea { font: inherit; color: inherit; }
+        button { cursor: pointer; }
+
+        :focus-visible {
+            outline: 2px solid var(--signal-text);
+            outline-offset: 2px;
+        }
+
+        [hidden] { display: none !important; }
+        .hidden { display: none !important; }
+
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; overflow: hidden;
+            clip: rect(0 0 0 0); white-space: nowrap;
+        }
+
+        .app {
             max-width: 500px;
             margin: 0 auto;
-            padding: 20px;
             min-height: 100vh;
             min-height: 100dvh;
             display: flex;
             flex-direction: column;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-            position: relative;
+        /* ---------- Top bar ---------- */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
         }
 
         .brandmark {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             text-decoration: none;
+            min-height: 44px;
         }
 
-        .brandmark .logomark {
-            width: 30px;
-            height: 30px;
-            display: block;
-        }
+        .brandmark .logomark { width: 24px; height: 24px; display: block; }
 
         .wordmark {
             font-family: var(--font-display);
             font-weight: 800;
-            font-size: 2.125rem;
+            font-size: 1.375rem;
             color: var(--fog);
             letter-spacing: -0.02em;
             line-height: 1;
         }
 
-        .subhead {
+        .build-tag {
             font-family: var(--font-mono);
             font-size: 0.6875rem;
             color: var(--smoke);
-            font-weight: 500;
-            margin-top: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.16em;
+            letter-spacing: 0.1em;
+            margin-left: 4px;
         }
 
-        .subhead .build-tag {
-            color: var(--signal);
-        }
-
-        .install-link {
-            display: inline-block;
-            margin-top: 12px;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            letter-spacing: 0.04em;
-            color: var(--signal);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .install-link:hover {
-            color: var(--fog);
-            text-decoration: underline;
-        }
-
-        /* About / info affordance */
-        .about-btn {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 40px;
-            height: 40px;
-            display: flex;
+        .icon-btn {
+            width: 44px;
+            height: 44px;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             background: none;
             border: none;
             color: var(--smoke);
-            font-size: 1.25rem;
-            cursor: pointer;
             border-radius: 50%;
             transition: color 0.2s, background 0.2s;
         }
 
-        .about-btn:hover {
-            color: var(--fog);
-            background: var(--charcoal-light);
-        }
-        .about-btn:active { transform: scale(0.92); }
+        .icon-btn:hover { color: var(--fog); background: var(--charcoal-light); }
+        .icon-btn svg { width: 22px; height: 22px; }
 
-        .camera-section {
+        /* ---------- Views ---------- */
+        main { flex: 1; display: flex; flex-direction: column; }
+
+        .view {
             flex: 1;
             display: flex;
             flex-direction: column;
             gap: 16px;
+            padding: 4px 16px 24px;
         }
 
+        .view.has-tabbar { padding-bottom: calc(var(--tabbar-h) + var(--safe-b) + 24px); }
+        .view.has-actionbar { padding-bottom: calc(96px + var(--safe-b) + 24px); }
+
+        .view-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: -0.01em;
+            line-height: 1.15;
+        }
+
+        .view-title:focus { outline: none; }
+
+        .view-sub { color: var(--smoke); font-size: 0.9375rem; margin-top: 4px; }
+
+        .eyebrow {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--smoke);
+        }
+
+        /* ---------- Buttons ---------- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 48px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            text-decoration: none;
+            text-align: center;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+        .btn-block { width: 100%; }
+        .btn-primary { background: var(--signal); color: var(--ink); }
+        .btn-primary:hover { background: var(--signal-dim); }
+        .btn-success { background: var(--sage); color: var(--ink); }
+        .btn-success:hover { background: var(--sage-dim); }
+        .btn-secondary {
+            background: transparent;
+            color: var(--fog);
+            box-shadow: inset 0 0 0 1px var(--field-line);
+        }
+        .btn-secondary:hover { background: var(--charcoal-light); }
+        .btn-quiet { background: none; color: var(--smoke); font-weight: 500; }
+        .btn-quiet:hover { color: var(--fog); }
+        .btn-danger { background: none; color: var(--error); font-weight: 500; }
+        .btn-coffee { background: var(--coffee); color: var(--ink); }
+        .btn-coffee:hover { background: #e8bd6c; }
+        .btn-linkedin { background: #0a66c2; color: #fff; }
+        .btn-linkedin:hover { background: #004182; }
+        .btn:active:not(:disabled) { transform: scale(0.97); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .text-link {
+            color: var(--signal-text);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            background: none;
+            border: none;
+            font-size: 0.9375rem;
+            min-height: 44px;
+            padding: 0 8px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        /* ---------- Scan view ---------- */
         .preview-container {
             position: relative;
             background: var(--charcoal-deep);
@@ -166,423 +237,493 @@
             border: 1px solid var(--hairline);
         }
 
-        #video, #canvas, #preview {
+        #video, #frozen {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
         }
 
-        #canvas {
-            display: none;
+        .card-guide {
+            position: absolute;
+            left: 7%;
+            right: 7%;
+            top: 50%;
+            aspect-ratio: 1.75;
+            transform: translateY(-50%);
+            border: 2px dashed rgba(250, 250, 247, 0.55);
+            border-radius: 10px;
+            pointer-events: none;
         }
 
-        #preview {
-            display: none;
+        .preview-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 20px;
+            text-align: center;
+            background: rgba(20, 25, 26, 0.72);
+        }
+
+        .preview-overlay p { font-size: 1rem; max-width: 300px; }
+        .preview-overlay .overlay-title { font-weight: 700; font-size: 1.0625rem; }
+        .preview-overlay .overlay-body { color: var(--smoke); font-size: 0.9375rem; }
+        .overlay-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(250, 250, 247, 0.25);
+            border-top-color: var(--fog);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .scan-hint { text-align: center; color: var(--smoke); font-size: 0.9375rem; }
+
+        .scan-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
         }
 
         .capture-btn {
-            width: 72px;
-            height: 72px;
+            width: 76px;
+            height: 76px;
             border-radius: 50%;
-            border: 4px solid #fff;
+            border: 4px solid var(--fog);
             background: transparent;
-            cursor: pointer;
-            margin: 0 auto;
             position: relative;
-            transition: all 0.2s;
+            transition: opacity 0.2s;
         }
 
         .capture-btn::after {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 56px;
-            height: 56px;
+            inset: 4px;
             border-radius: 50%;
-            background: #fff;
-            transition: all 0.2s;
+            background: var(--fog);
+            transition: transform 0.15s;
         }
 
-        .capture-btn:active::after {
-            transform: translate(-50%, -50%) scale(0.9);
-        }
+        .capture-btn:active:not(:disabled)::after { transform: scale(0.9); }
+        .capture-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-        .capture-btn:disabled {
-            opacity: 0.5;
-        }
-
-        .btn {
-            padding: 14px 24px;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-family: var(--font-body);
-            font-size: 1rem;
-            font-weight: 700;
-            letter-spacing: 0.01em;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background: var(--signal);
-            color: #fff;
-        }
-
-        .btn-primary:hover {
-            background: var(--signal-dim);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--fog);
-            box-shadow: inset 0 0 0 1px rgba(250, 250, 247, 0.2);
-        }
-
-        .btn-secondary:hover {
-            background: var(--charcoal-light);
-        }
-
-        .btn-success {
-            background: var(--sage);
-            color: #fff;
-        }
-
-        .btn-success:hover {
-            background: var(--sage-dim);
-        }
-
-        .btn:active:not(:disabled) {
-            transform: scale(0.97);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        a.btn {
-            text-decoration: none;
-            display: inline-block;
+        .install-link {
+            display: block;
             text-align: center;
-        }
-
-        .button-row {
-            display: flex;
-            gap: 12px;
-        }
-
-        .button-row .btn {
-            flex: 1;
-        }
-
-        .status {
-            text-align: center;
-            padding: 12px;
-            border-radius: var(--radius-sm);
             font-family: var(--font-mono);
-            font-size: 0.8125rem;
-            letter-spacing: 0.02em;
+            font-size: 0.75rem;
+            letter-spacing: 0.04em;
+            color: var(--signal-text);
+            text-decoration: none;
+            padding: 12px;
+            margin-top: auto;
         }
 
-        .status.loading {
-            background: var(--charcoal-light);
-            color: var(--signal);
+        .demo-flag {
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--ink);
+            background: var(--coffee);
+            border-radius: var(--radius-sm);
+            padding: 6px 10px;
         }
 
-        .status.error {
-            background: rgba(240, 138, 130, 0.12);
+        /* ---------- Review / edit form ---------- */
+        .review-photo {
+            width: 100%;
+            max-height: 170px;
+            object-fit: contain;
+            background: var(--charcoal-deep);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--hairline);
+        }
+
+        .form-grid { display: flex; flex-direction: column; gap: 14px; }
+        .form-row { display: flex; gap: 12px; }
+        .form-row .field { flex: 1; min-width: 0; }
+
+        .field label {
+            display: block;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--smoke);
+            margin-bottom: 6px;
+        }
+
+        .field input, .field textarea,
+        .custom-template-inputs input, .custom-template-inputs textarea {
+            width: 100%;
+            background: var(--charcoal-deep);
+            border: 1px solid var(--field-line);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            min-height: 48px;
+            color: var(--fog);
+            font-family: var(--font-body);
+            font-size: 1rem;           /* 16px: stops iOS zooming on focus */
+        }
+
+        .field textarea, .custom-template-inputs textarea { min-height: 88px; resize: vertical; }
+
+        .field input:focus, .field textarea:focus,
+        .custom-template-inputs input:focus, .custom-template-inputs textarea:focus {
+            outline: none;
+            border-color: var(--signal-text);
+            box-shadow: 0 0 0 1px var(--signal-text);
+        }
+
+        .field input[aria-invalid="true"] { border-color: var(--error); }
+
+        .field-hint { font-size: 0.8125rem; color: var(--error); margin-top: 6px; }
+
+        details.more-fields summary {
+            list-style: none;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--signal-text);
+            font-size: 0.9375rem;
+            cursor: pointer;
+        }
+
+        details.more-fields summary::-webkit-details-marker { display: none; }
+        details.more-fields summary::before { content: '+'; font-family: var(--font-mono); font-size: 1.125rem; }
+        details.more-fields[open] summary::before { content: '–'; }
+        details.more-fields .form-grid { margin-top: 8px; }
+
+        .form-error {
+            background: rgba(245, 161, 153, 0.12);
             color: var(--error);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            font-size: 0.9375rem;
         }
 
-        .status.success {
-            background: rgba(107, 143, 113, 0.16);
-            color: #9ec7a3;
+        /* Sticky bottom action bar (review + detail) */
+        .actionbar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 50;
+            background: linear-gradient(to top, var(--charcoal) 78%, rgba(45, 52, 54, 0));
+            padding: 20px 16px calc(14px + var(--safe-b));
         }
+
+        .actionbar-inner {
+            max-width: 468px;
+            margin: 0 auto;
+            display: flex;
+            gap: 10px;
+        }
+
+        .actionbar-inner .btn-grow { flex: 1; }
+
+        /* ---------- Contact detail ---------- */
+        .back-link {
+            align-self: flex-start;
+            margin-left: -8px;
+            text-decoration: none;
+        }
+
+        .saved-banner {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(107, 143, 113, 0.18);
+            color: var(--sage-text);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            font-weight: 700;
+        }
+
+        .saved-banner svg { width: 20px; height: 20px; flex-shrink: 0; }
 
         .contact-card {
             background: var(--charcoal-light);
             border-radius: var(--radius-md);
-            padding: 20px;
-            margin-top: 16px;
+            padding: 18px;
             border: 1px solid var(--hairline);
         }
 
         .contact-card h2 {
             font-family: var(--font-display);
             font-weight: 700;
-            font-size: 1.375rem;
+            font-size: 1.5rem;
             letter-spacing: -0.01em;
-            margin-bottom: 4px;
+            line-height: 1.15;
+            word-break: break-word;
         }
 
-        .contact-card .company {
-            color: var(--smoke);
-            font-size: 0.875rem;
-            margin-bottom: 16px;
-        }
+        .contact-card h2:focus { outline: none; }
+        .contact-card .company { color: var(--smoke); font-size: 0.9375rem; margin-top: 4px; }
+        .contact-fields { margin-top: 12px; }
 
         .contact-field {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--hairline);
+            min-height: 44px;
+            padding: 8px 0;
+            border-top: 1px solid var(--hairline);
         }
 
-        .contact-field:last-child {
-            border-bottom: none;
-        }
+        .contact-field svg { width: 18px; height: 18px; color: var(--smoke); flex-shrink: 0; }
+        .contact-field .value { flex: 1; word-break: break-word; }
+        .contact-field a { color: var(--signal-text); text-decoration: none; }
 
-        .contact-field .icon {
-            width: 20px;
-            text-align: center;
-            color: var(--smoke);
-        }
-
-        .contact-field .value {
-            flex: 1;
-            word-break: break-word;
-        }
-
-        .contact-field a {
-            color: var(--signal);
-            text-decoration: none;
-        }
-
-        .action-row {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-        }
+        .action-grid { display: flex; gap: 10px; }
 
         .action-btn {
+            flex: 1;
+            min-width: 0;
+            min-height: 72px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            justify-content: center;
+            gap: 6px;
             background: var(--charcoal-deep);
-            border: 1px solid var(--hairline);
+            border: 1px solid var(--field-line);
             border-radius: var(--radius-sm);
             padding: 10px 6px;
-            cursor: pointer;
-            transition: border-color 0.2s, background 0.2s, transform 0.1s;
-            flex: 1;
-            min-width: 0;
-        }
-
-        .action-btn:active {
-            transform: scale(0.95);
-            background: var(--charcoal-light);
-        }
-
-        .action-btn:hover {
-            border-color: var(--signal);
-            background: var(--charcoal-light);
-        }
-
-        .action-btn .action-icon {
-            font-size: 1.25rem;
-            line-height: 1;
-        }
-
-        .action-btn .action-label {
-            font-family: var(--font-mono);
-            font-size: 0.625rem;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            color: var(--smoke);
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid var(--charcoal-light);
-            border-top-color: var(--signal);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .ocr-preview {
-            background: var(--charcoal-deep);
-            border-radius: var(--radius-sm);
-            padding: 12px;
-            margin-top: 12px;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            color: var(--smoke);
-            max-height: 100px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        /* Batch contacts section */
-        .batch-section {
-            background: var(--charcoal-light);
-            border-radius: var(--radius-md);
-            padding: 16px;
-            margin-bottom: 16px;
-            border: 1px solid var(--hairline);
-        }
-
-        .batch-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .batch-header h3 {
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            color: var(--smoke);
-        }
-
-        .batch-count {
-            background: var(--signal);
-            color: #fff;
-            padding: 4px 11px;
-            border-radius: 20px;
-            font-family: var(--font-mono);
-            font-size: 0.8125rem;
-            font-weight: 600;
-        }
-
-        .batch-list {
-            max-height: 150px;
-            overflow-y: auto;
-            margin-bottom: 12px;
-        }
-
-        .batch-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 12px;
-            background: var(--charcoal-deep);
-            border-radius: var(--radius-sm);
-            margin-bottom: 8px;
-        }
-
-        .batch-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .batch-item-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .batch-item-name {
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .batch-item-company {
-            font-size: 0.75rem;
-            color: var(--smoke);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .batch-item-remove {
-            background: none;
-            border: none;
-            color: var(--error);
-            cursor: pointer;
-            padding: 4px 8px;
-            font-size: 1.25rem;
-            line-height: 1;
-        }
-
-        .batch-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .batch-actions .btn {
-            flex: 1;
-            padding: 10px 16px;
+            color: var(--fog);
             font-size: 0.875rem;
+            font-weight: 500;
+            transition: border-color 0.2s, background 0.2s, transform 0.1s;
         }
 
-        /* Footer */
-        .footer {
+        .action-btn svg { width: 22px; height: 22px; color: var(--signal-text); }
+        .action-btn:hover { border-color: var(--signal-text); background: var(--charcoal-light); }
+        .action-btn:active { transform: scale(0.96); }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 48px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-row input { position: absolute; opacity: 0; pointer-events: none; }
+
+        .toggle-box {
+            width: 46px;
+            height: 28px;
+            border-radius: 14px;
+            background: var(--charcoal-deep);
+            box-shadow: inset 0 0 0 1px var(--field-line);
+            position: relative;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .toggle-box::after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--smoke);
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .toggle-row input:checked + .toggle-box { background: var(--sage); box-shadow: none; }
+        .toggle-row input:checked + .toggle-box::after { transform: translateX(18px); background: #fff; }
+        .toggle-row input:focus-visible + .toggle-box { outline: 2px solid var(--signal-text); outline-offset: 2px; }
+        .toggle-row .toggle-label { font-size: 0.9375rem; }
+
+        .detail-manage { display: flex; justify-content: space-between; }
+
+        /* ---------- Contacts list ---------- */
+        .list-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+
+        .contact-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+        .contact-row {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 60px;
+            padding: 10px 12px 10px 14px;
+            background: var(--charcoal-light);
+            border: 1px solid var(--hairline);
+            border-radius: var(--radius-sm);
+            text-align: left;
+            transition: border-color 0.2s;
+        }
+
+        .contact-row:hover { border-color: var(--signal-text); }
+        .contact-row .row-info { flex: 1; min-width: 0; }
+        .contact-row .row-name { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .contact-row .row-company { font-size: 0.875rem; color: var(--smoke); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .contact-row .row-chevron { width: 18px; height: 18px; color: var(--smoke); flex-shrink: 0; }
+
+        .chip {
+            font-family: var(--font-mono);
+            font-size: 0.6875rem;
+            letter-spacing: 0.04em;
+            padding: 3px 8px;
+            border-radius: 10px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .chip-done { background: rgba(107, 143, 113, 0.22); color: var(--sage-text); }
+        .chip-todo { box-shadow: inset 0 0 0 1px var(--field-line); color: var(--smoke); }
+
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
             text-align: center;
-            padding: 24px 0 12px;
+            padding: 32px 12px;
+        }
+
+        .empty-state svg { width: 44px; height: 44px; color: var(--smoke); }
+        .empty-state p { color: var(--smoke); max-width: 280px; }
+
+        .export-block { display: flex; flex-direction: column; gap: 10px; }
+        .fine-print { font-size: 0.8125rem; color: var(--smoke); text-align: center; line-height: 1.5; }
+
+        .list-footer {
             margin-top: auto;
+            padding-top: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
         }
 
         .footer-coffee {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: transparent;
+            min-height: 44px;
             color: var(--coffee);
-            padding: 11px 20px;
+            padding: 0 20px;
             border-radius: var(--radius-sm);
-            box-shadow: inset 0 0 0 1px rgba(217, 164, 65, 0.4);
+            box-shadow: inset 0 0 0 1px rgba(217, 164, 65, 0.5);
             font-family: var(--font-mono);
             font-size: 0.8125rem;
             letter-spacing: 0.03em;
-            font-weight: 500;
             text-decoration: none;
-            transition: background 0.2s, color 0.2s;
         }
 
-        .footer-coffee:hover {
-            background: rgba(217, 164, 65, 0.12);
-            color: #e8bd6c;
-        }
+        .footer-attribution { font-family: var(--font-mono); font-size: 0.75rem; color: var(--smoke); }
+        .footer-attribution a { color: var(--signal-text); text-decoration: none; display: inline-block; padding: 14px 2px; }
 
-        .footer-attribution {
-            margin-top: 16px;
-            font-family: var(--font-mono);
-            font-size: 0.6875rem;
-            letter-spacing: 0.04em;
-            color: var(--smoke);
-        }
-
-        .footer-attribution a {
-            color: var(--signal);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .footer-attribution a:hover {
-            color: var(--fog);
-        }
-
-        /* Donation Modal */
-        .modal-overlay {
+        /* ---------- Tab bar ---------- */
+        .tabbar {
             position: fixed;
-            top: 0;
             left: 0;
             right: 0;
             bottom: 0;
+            z-index: 60;
+            background: var(--charcoal-deep);
+            border-top: 1px solid var(--hairline);
+            padding-bottom: var(--safe-b);
+        }
+
+        .tabbar-inner { max-width: 500px; margin: 0 auto; display: flex; height: var(--tabbar-h); }
+
+        .tab {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: var(--smoke);
+            font-size: 0.75rem;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .tab svg { width: 24px; height: 24px; }
+        .tab[aria-current="page"] { color: var(--fog); }
+        .tab[aria-current="page"] svg { color: var(--signal-text); }
+
+        .tab-badge {
+            position: absolute;
+            top: 8px;
+            left: calc(50% + 8px);
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            border-radius: 10px;
+            background: var(--signal);
+            color: var(--ink);
+            font-family: var(--font-mono);
+            font-size: 0.6875rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ---------- Toast ---------- */
+        .toast {
+            position: fixed;
+            left: 16px;
+            right: 16px;
+            bottom: calc(var(--tabbar-h) + var(--safe-b) + 12px);
+            z-index: 900;
+            max-width: 468px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: var(--fog);
+            color: var(--ink);
+            border-radius: var(--radius-sm);
+            padding: 6px 6px 6px 16px;
+            min-height: 48px;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        }
+
+        .toast.above-actionbar { bottom: calc(96px + var(--safe-b)); }
+
+        .toast button {
+            background: none;
+            border: none;
+            color: #24527a;
+            font-weight: 700;
+            min-height: 44px;
+            min-width: 44px;
+            padding: 0 12px;
+        }
+
+        /* ---------- Modals ---------- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
             background: rgba(0, 0, 0, 0.75);
             display: flex;
             align-items: center;
@@ -601,76 +742,40 @@
             border: 1px solid var(--hairline);
         }
 
-        .modal-content .modal-icon {
-            font-size: 2.25rem;
-            margin-bottom: 14px;
-        }
+        .modal-content .modal-icon { font-size: 2.25rem; margin-bottom: 14px; }
+        .modal-content p { font-size: 0.9375rem; line-height: 1.6; margin-bottom: 20px; }
+        .modal-buttons { display: flex; flex-direction: column; gap: 10px; }
+        .modal-buttons .btn { width: 100%; }
 
-        .modal-content p {
-            font-size: 0.9375rem;
-            line-height: 1.6;
-            color: var(--fog);
-            margin-bottom: 20px;
-        }
-
-        .modal-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .modal-buttons .btn {
-            width: 100%;
-        }
-
-        .btn-coffee {
-            background: var(--coffee);
-            color: #2a2017;
-            font-weight: 700;
-        }
-
-        .btn-coffee:hover {
-            background: #e8bd6c;
-        }
-
-        /* Template Picker & LinkedIn Modal */
+        /* Bottom sheets */
         .picker-modal {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            inset: 0;
             background: rgba(0, 0, 0, 0);
             display: flex;
             align-items: flex-end;
             justify-content: center;
             z-index: 1000;
-            padding: 20px;
             transition: background 0.2s ease;
             pointer-events: none;
         }
 
-        .picker-modal.visible {
-            background: rgba(0, 0, 0, 0.75);
-            pointer-events: auto;
-        }
+        .picker-modal.visible { background: rgba(0, 0, 0, 0.75); pointer-events: auto; }
 
         .picker-content {
             background: var(--charcoal-light);
             border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-            padding: 24px;
+            padding: 24px 20px calc(16px + var(--safe-b));
             max-width: 500px;
             width: 100%;
-            max-height: 80vh;
+            max-height: 86vh;
             overflow-y: auto;
             transform: translateY(100%);
             transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
             border-top: 1px solid var(--hairline);
         }
 
-        .picker-modal.visible .picker-content {
-            transform: translateY(0);
-        }
+        .picker-modal.visible .picker-content { transform: translateY(0); }
 
         .picker-content::before {
             content: '';
@@ -691,240 +796,92 @@
             margin-bottom: 4px;
         }
 
-        .picker-subtitle {
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            letter-spacing: 0.02em;
-            color: var(--smoke);
-            margin-bottom: 16px;
-        }
+        .picker-title:focus { outline: none; }
+        .picker-subtitle { font-size: 0.875rem; color: var(--smoke); margin-bottom: 16px; word-break: break-word; }
 
-        .template-card {
+        .template-card, .note-card {
+            display: block;
+            width: 100%;
+            text-align: left;
             background: var(--charcoal-deep);
-            border: 1px solid var(--hairline);
+            border: 1px solid var(--field-line);
             border-radius: var(--radius-sm);
             padding: 14px 16px;
             margin-bottom: 10px;
-            cursor: pointer;
+            position: relative;
             transition: border-color 0.2s, background 0.2s;
         }
 
-        .template-card:hover {
-            border-color: var(--signal);
-            background: var(--charcoal);
-        }
-
-        .template-card:active {
-            transform: scale(0.98);
-            background: var(--charcoal);
-        }
-
-        .template-card .template-name {
-            font-weight: 700;
-            font-size: 0.9375rem;
-            margin-bottom: 4px;
-        }
-
+        .template-card:hover, .note-card:hover { border-color: var(--signal-text); background: var(--charcoal); }
+        .template-card:active, .note-card:active { transform: scale(0.98); }
+        .template-card .template-name { display: block; font-weight: 700; font-size: 0.9375rem; margin-bottom: 4px; }
         .template-card .template-preview {
-            font-size: 0.8125rem;
+            display: block;
+            font-size: 0.875rem;
             color: var(--smoke);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .custom-template-inputs {
-            display: none;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 12px;
-        }
-
-        .custom-template-inputs.active {
-            display: flex;
-        }
-
-        .custom-template-inputs input,
-        .custom-template-inputs textarea {
-            background: var(--charcoal-deep);
-            border: 1px solid var(--hairline);
-            border-radius: var(--radius-sm);
-            padding: 12px;
-            color: var(--fog);
-            font-family: var(--font-body);
-            font-size: 0.875rem;
-            resize: vertical;
-        }
-
-        .custom-template-inputs textarea {
-            min-height: 80px;
-        }
-
-        .custom-template-inputs input:focus,
-        .custom-template-inputs textarea:focus {
-            outline: none;
-            border-color: var(--signal);
-        }
-
-        .picker-cancel {
-            display: block;
-            width: 100%;
-            text-align: center;
-            padding: 14px;
-            color: var(--smoke);
-            font-family: var(--font-mono);
-            font-size: 0.8125rem;
-            letter-spacing: 0.03em;
-            cursor: pointer;
-            background: none;
-            border: none;
-            margin-top: 8px;
-        }
-
-        .picker-cancel:hover {
-            color: var(--fog);
-        }
-
-        /* LinkedIn button */
-        .btn-linkedin {
-            background: #0a66c2;
-            color: #fff;
-        }
-
-        .btn-linkedin:hover {
-            background: #004182;
-        }
-
-        /* Connection note copy cards */
-        .note-card {
-            background: var(--charcoal-deep);
-            border: 1px solid var(--hairline);
-            border-radius: var(--radius-sm);
-            padding: 14px 16px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: border-color 0.2s, background 0.2s;
-            position: relative;
-        }
-
-        .note-card:hover {
-            border-color: var(--signal);
-            background: var(--charcoal);
-        }
-
-        .note-card:active {
-            transform: scale(0.98);
-            background: var(--charcoal);
-        }
+        .custom-template-inputs { display: none; flex-direction: column; gap: 10px; margin: 2px 0 10px; }
+        .custom-template-inputs.active { display: flex; }
 
         .note-card .note-label {
+            display: block;
             font-family: var(--font-mono);
-            font-weight: 500;
-            font-size: 0.6875rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            color: var(--signal);
+            color: var(--signal-text);
             margin-bottom: 6px;
         }
 
-        .note-card .note-text {
-            font-size: 0.875rem;
-            color: var(--fog);
-            line-height: 1.45;
-        }
+        .note-card .note-text { display: block; font-size: 0.9375rem; line-height: 1.45; }
 
         .note-card .copied-badge {
             position: absolute;
             top: 10px;
             right: 12px;
             background: var(--sage);
-            color: #fff;
+            color: var(--ink);
             font-family: var(--font-mono);
-            font-size: 0.625rem;
-            letter-spacing: 0.04em;
+            font-size: 0.6875rem;
             padding: 2px 8px;
             border-radius: 10px;
             opacity: 0;
             transition: opacity 0.2s;
         }
 
-        .note-card .copied-badge.show {
-            opacity: 1;
-        }
+        .note-card .copied-badge.show { opacity: 1; }
 
-        /* Signature toggle (in email/LinkedIn pickers) */
-        .sig-toggle {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 2px 4px;
-            cursor: pointer;
-            user-select: none;
-        }
+        .sig-toggle { padding: 4px 2px; }
+        .sig-toggle .toggle-label { font-size: 0.875rem; color: var(--smoke); }
 
-        .sig-toggle input {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .sig-toggle .sig-box {
-            width: 38px;
-            height: 22px;
-            border-radius: 11px;
-            background: var(--charcoal-deep);
-            box-shadow: inset 0 0 0 1px var(--hairline);
-            position: relative;
-            transition: background 0.2s;
-            flex-shrink: 0;
-        }
-
-        .sig-toggle .sig-box::after {
-            content: '';
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: var(--smoke);
-            transition: transform 0.2s, background 0.2s;
-        }
-
-        .sig-toggle input:checked + .sig-box {
-            background: var(--signal);
-            box-shadow: none;
-        }
-
-        .sig-toggle input:checked + .sig-box::after {
-            transform: translateX(16px);
-            background: #fff;
-        }
-
-        .sig-toggle .sig-label {
-            font-family: var(--font-mono);
-            font-size: 0.6875rem;
-            letter-spacing: 0.03em;
+        .picker-cancel {
+            display: block;
+            width: 100%;
+            min-height: 48px;
+            text-align: center;
             color: var(--smoke);
-            line-height: 1.3;
+            font-size: 0.9375rem;
+            background: none;
+            border: none;
+            margin-top: 8px;
         }
+
+        .picker-cancel:hover { color: var(--fog); }
 
         /* About sheet */
-        .about-lede {
-            font-size: 0.9375rem;
-            line-height: 1.6;
-            color: var(--fog);
-            margin-bottom: 4px;
-        }
-
-        .about-lede strong { color: var(--fog); font-weight: 700; }
+        .about-lede { font-size: 0.9375rem; line-height: 1.6; margin-bottom: 4px; }
+        .about-lede strong { font-weight: 700; }
 
         .about-eyebrow {
             font-family: var(--font-mono);
-            font-size: 0.625rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.14em;
-            color: var(--signal);
+            letter-spacing: 0.12em;
+            color: var(--signal-text);
             margin: 22px 0 10px;
         }
 
@@ -942,50 +899,21 @@
             transition: border-color 0.2s, background 0.2s;
         }
 
-        .about-link:hover {
-            border-color: var(--signal);
-            background: var(--charcoal);
-        }
-
-        .about-link .al-title {
-            display: block;
-            font-weight: 700;
-            font-size: 0.9375rem;
-            color: var(--fog);
-        }
-
-        .about-link .al-desc {
-            display: block;
-            font-size: 0.8125rem;
-            line-height: 1.4;
-            color: var(--smoke);
-            margin-top: 3px;
-        }
-
-        .about-link .al-arrow {
-            color: var(--signal);
-            font-size: 0.875rem;
-            flex-shrink: 0;
-        }
-
-        .about-foot {
-            font-family: var(--font-mono);
-            font-size: 0.6875rem;
-            letter-spacing: 0.04em;
-            color: var(--smoke);
-            text-align: center;
-            margin-top: 20px;
-        }
+        .about-link:hover { border-color: var(--signal-text); background: var(--charcoal); }
+        .about-link .al-title { display: block; font-weight: 700; font-size: 0.9375rem; color: var(--fog); }
+        .about-link .al-desc { display: block; font-size: 0.8125rem; line-height: 1.4; color: var(--smoke); margin-top: 3px; }
+        .about-link .al-arrow { color: var(--signal-text); font-size: 0.875rem; flex-shrink: 0; }
+        .about-foot { font-family: var(--font-mono); font-size: 0.75rem; color: var(--smoke); text-align: center; margin-top: 20px; }
 
         /* Post-export "next step" card */
         #exportPrompt .modal-content { text-align: left; max-width: 380px; }
 
         .ep-check {
             font-family: var(--font-mono);
-            font-size: 0.6875rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: var(--sage);
+            color: var(--sage-text);
             margin-bottom: 12px;
         }
 
@@ -995,37 +923,51 @@
             font-size: 1.375rem;
             line-height: 1.15;
             letter-spacing: -0.01em;
-            color: var(--fog);
             margin-bottom: 10px;
         }
 
-        .ep-body {
-            font-size: 0.9375rem;
-            line-height: 1.55;
-            color: var(--smoke);
-            margin-bottom: 20px;
-        }
+        .ep-body { font-size: 0.9375rem; line-height: 1.55; color: var(--smoke); margin-bottom: 20px; }
 
         .ep-secondary {
-            display: block;
-            text-align: center;
-            margin-top: 14px;
-            font-family: var(--font-mono);
-            font-size: 0.8125rem;
-            letter-spacing: 0.02em;
-            color: var(--smoke);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            margin-top: 6px;
+            font-size: 0.9375rem;
+            color: var(--signal-text);
             text-decoration: none;
         }
 
-        .ep-secondary:hover { color: var(--fog); }
-        .ep-dismiss { color: var(--smoke); }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { transition: none !important; animation-duration: 0.01ms !important; }
+            .spinner { animation: spin 2s linear infinite !important; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <button class="about-btn" id="aboutBtn" aria-label="About Cardvark and Rise Above">ⓘ</button>
-            <a class="brandmark" href="https://rise-above.net" target="_blank" rel="noopener" aria-label="Rise Above Partners">
+    <!-- Icon sprite -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+        <defs>
+            <g id="i-camera" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></g>
+            <g id="i-list" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 19c.6-3 3-4.5 6-4.5s5.400 1.500 6 4.500"/><path d="M16 5.500a3 3 0 0 1 0 5M18 14.800c1.600.600 2.600 2 3 4.200"/></g>
+            <g id="i-mail" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.500 7l8.500 6 8.500-6"/></g>
+            <g id="i-phone" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.500" width="10" height="19" rx="2"/><path d="M11 18h2"/></g>
+            <g id="i-pin" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.200 7-11a7 7 0 0 0-14 0c0 4.800 7 11 7 11z"/><circle cx="12" cy="10" r="2.500"/></g>
+            <g id="i-globe" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.500 2.600 3.800 5.600 3.800 9s-1.300 6.400-3.800 9c-2.500-2.600-3.800-5.600-3.800-9S9.500 5.600 12 3z"/></g>
+            <g id="i-link" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.700 0l3-3a4 4 0 0 0-5.700-5.700l-1 1"/><path d="M14 10a4 4 0 0 0-5.700 0l-3 3a4 4 0 0 0 5.700 5.700l1-1"/></g>
+            <g id="i-linkedin" fill="currentColor"><path d="M5.400 3.500a1.900 1.900 0 1 1 0 3.800 1.900 1.900 0 0 1 0-3.800zM3.800 9h3.200v11.500H3.800zM9.300 9h3v1.600h.1c.500-.900 1.700-1.900 3.400-1.900 3.400 0 4.200 2.200 4.200 5.200v6.600h-3.200v-5.900c0-1.400 0-3.100-1.900-3.100s-2.300 1.400-2.300 3v6H9.300z"/></g>
+            <g id="i-userplus" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="8" r="3.500"/><path d="M3 20c.700-3.500 3.500-5.200 7-5.200 1.300 0 2.500.200 3.500.700"/><path d="M18 14v6M15 17h6"/></g>
+            <g id="i-check" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.500l4.500 4.500L19 7.500"/></g>
+            <g id="i-chevron" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></g>
+            <g id="i-info" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.500v.100"/></g>
+            <g id="i-card" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.500" y="5" width="19" height="14" rx="2"/><circle cx="8" cy="11" r="2"/><path d="M5 16c.500-1.500 1.600-2.200 3-2.200s2.500.700 3 2.200M14 10h4.500M14 14h3"/></g>
+        </defs>
+    </svg>
+
+    <div class="app">
+        <header class="topbar">
+            <a class="brandmark" href="https://rise-above.net" target="_blank" rel="noopener" aria-label="Cardvark, a Rise Above Partners build">
                 <svg class="logomark" viewBox="0 0 187.5 187.5" aria-hidden="true" focusable="false">
                     <path fill="#6d98ba" d="M184.26 103.46v3.78h-9.75l-21.35-21.45-11.95 10.52-2.83 2.5-11.15 9.81-2.83 2.49-23.2 20.43-24.52-19.15-2.99-2.33-11.92-9.32-2.98-2.33-20.2-15.77-28.88 24.07h-6.96v-3.77h5.6l30.17-25.14 22.84 17.85 2.99 2.33 11.93 9.33 2.99 2.33 21.77 17.01 20.91-18.4 2.83-2.49 11.11-9.78 2.84-2.5 14.6-12.85 22.74 22.84z"/>
                     <path fill="#6d98ba" d="M184.26 134.58v3.77h-36.74l-23.12-27.23-2.45-2.88-19.6-23.09-23.08 24.49-2.6 2.75-24.47 25.96H2.75v-3.77h47.82l23.12-24.52 2.6-2.75 26.21-27.8 22.29 26.24 2.44 2.88 22.05 25.96z"/>
@@ -1033,116 +975,264 @@
                     <path fill="#6d98ba" d="M180.48 116.73h-21.45l-17.82-20.42-2.48-2.84-36.43-41.73-40.93 43.9-2.58 2.77-17.09 18.32H2.75v3.77h40.59l18.43-19.76 2.58-2.77 37.85-40.6 33.7 38.6 2.48 2.84 18.94 21.69h26.94v-3.77z"/>
                 </svg>
                 <span class="wordmark">Cardvark</span>
+                <span class="build-tag">A Rise Above build</span>
             </a>
-            <p class="subhead">Card Scanner <span class="build-tag">· A Rise Above Build</span></p>
-            <a href="install.html" class="install-link" id="installLink">Add to your home screen →</a>
+            <button class="icon-btn" id="aboutBtn" aria-label="About Cardvark and Rise Above">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-info"/></svg>
+            </button>
         </header>
 
-        <!-- Batch contacts section -->
-        <div id="batchSection" class="batch-section hidden">
-            <div class="batch-header">
-                <h3>Scanned Contacts</h3>
-                <span class="batch-count" id="batchCount">0</span>
-            </div>
-            <div class="batch-list" id="batchList"></div>
-            <div class="batch-actions">
-                <button class="btn btn-secondary" id="clearAllBtn">Clear All</button>
-                <button class="btn btn-success" id="exportCsvBtn">Export CSV</button>
-            </div>
-        </div>
+        <main>
+            <!-- ========== SCAN ========== -->
+            <section id="viewScan" class="view has-tabbar" aria-labelledby="scanTitle">
+                <h1 id="scanTitle" class="sr-only" tabindex="-1">Scan a business card</h1>
+                <div id="demoFlag" class="demo-flag" hidden>Demo mode: scans return a sample card</div>
 
-        <div class="camera-section">
-            <div class="preview-container">
-                <video id="video" autoplay playsinline></video>
-                <canvas id="canvas"></canvas>
-                <img id="preview" alt="Captured image">
-            </div>
+                <div class="preview-container">
+                    <video id="video" autoplay playsinline muted aria-label="Camera preview"></video>
+                    <img id="frozen" alt="Captured card photo" hidden>
+                    <div class="card-guide" id="cardGuide" aria-hidden="true"></div>
 
-            <div id="captureControls">
-                <button class="capture-btn" id="captureBtn" disabled></button>
-            </div>
+                    <div class="preview-overlay" id="readingOverlay" role="status" hidden>
+                        <div class="spinner" aria-hidden="true"></div>
+                        <p class="overlay-title">Reading the card…</p>
+                    </div>
 
-            <div id="reviewControls" class="button-row hidden">
-                <button class="btn btn-secondary" id="retakeBtn">Retake</button>
-                <button class="btn btn-primary" id="processBtn">Read it</button>
-            </div>
+                    <div class="preview-overlay" id="errorOverlay" role="alert" hidden>
+                        <p class="overlay-title" id="errorTitle">That didn't work</p>
+                        <p class="overlay-body" id="errorBody"></p>
+                        <div class="overlay-actions">
+                            <button class="btn btn-primary" id="retryBtn">Try again</button>
+                            <button class="btn btn-secondary" id="retakeBtn">Retake photo</button>
+                        </div>
+                    </div>
 
-            <div id="status" class="status hidden"></div>
-            <div id="ocrPreview" class="ocr-preview hidden"></div>
-
-            <div id="contactCard" class="contact-card hidden">
-                <h2 id="contactName">—</h2>
-                <div class="company" id="contactCompany">—</div>
-                
-                <div id="contactFields"></div>
-
-                <div style="margin-top: 20px;">
-                    <button class="btn btn-success" id="addToBatchBtn" style="width:100%;">Add & Scan Next</button>
+                    <div class="preview-overlay" id="noCameraOverlay" hidden>
+                        <p class="overlay-title">Camera isn't available</p>
+                        <p class="overlay-body">Allow camera access in your browser settings, or use a photo of the card instead.</p>
+                        <div class="overlay-actions">
+                            <button class="btn btn-primary" id="uploadFallbackBtn">Choose a photo</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="action-row" style="margin-top: 12px;">
-                    <button class="action-btn" id="followUpBtn" style="display:none;">
-                        <span class="action-icon">✉️</span>
-                        <span class="action-label">Follow Up</span>
-                    </button>
-                    <button class="action-btn" id="linkedInBtn">
-                        <span class="action-icon">💼</span>
-                        <span class="action-label">LinkedIn</span>
-                    </button>
-                    <button class="action-btn" id="saveContactBtn">
-                        <span class="action-icon">👤</span>
-                        <span class="action-label">Save vCard</span>
-                    </button>
-                    <button class="action-btn" id="scanAnotherBtn">
-                        <span class="action-icon">⏭</span>
-                        <span class="action-label">Skip</span>
-                    </button>
-                </div>
-            </div>
-        </div>
 
-        <footer class="footer">
-            <a href="https://buymeacoffee.com/riseabovepartners" target="_blank" rel="noopener" class="footer-coffee">
-                ☕ Buy me a coffee
-            </a>
-            <div class="footer-attribution">
-                Brought to you by <a href="https://rise-above.net" target="_blank" rel="noopener">Rise Above Partners</a>
+                <p class="scan-hint" id="scanHint">Fit the card inside the frame, then tap the button.</p>
+
+                <div class="scan-controls" id="scanControls">
+                    <button class="capture-btn" id="captureBtn" aria-label="Take photo of card" disabled></button>
+                    <button class="text-link" id="uploadBtn">or choose a photo</button>
+                    <input type="file" id="fileInput" accept="image/*" class="sr-only" tabindex="-1" aria-hidden="true">
+                </div>
+
+                <a href="install.html" class="install-link" id="installLink">Add Cardvark to your home screen →</a>
+            </section>
+
+            <!-- ========== REVIEW / EDIT ========== -->
+            <section id="viewReview" class="view has-actionbar" aria-labelledby="reviewTitle" hidden>
+                <div>
+                    <h1 id="reviewTitle" class="view-title" tabindex="-1">Check the details</h1>
+                    <p class="view-sub" id="reviewSub">Fix anything the scan got wrong, then save.</p>
+                </div>
+
+                <img id="reviewPhoto" class="review-photo" alt="The card you scanned" hidden>
+
+                <form id="reviewForm" class="form-grid" novalidate>
+                    <div class="form-row">
+                        <div class="field">
+                            <label for="f_first_name">First name</label>
+                            <input id="f_first_name" name="first_name" type="text" autocomplete="off" autocapitalize="words">
+                        </div>
+                        <div class="field">
+                            <label for="f_last_name">Last name</label>
+                            <input id="f_last_name" name="last_name" type="text" autocomplete="off" autocapitalize="words">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="f_job_title">Job title</label>
+                        <input id="f_job_title" name="job_title" type="text" autocomplete="off">
+                    </div>
+                    <div class="field">
+                        <label for="f_company">Company</label>
+                        <input id="f_company" name="company" type="text" autocomplete="off">
+                    </div>
+                    <div id="emailFields" class="form-grid"></div>
+                    <div id="phoneFields" class="form-grid"></div>
+
+                    <details class="more-fields" id="moreFields">
+                        <summary>Website, address and social</summary>
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="f_website">Website</label>
+                                <input id="f_website" name="website" type="text" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false">
+                            </div>
+                            <div class="field">
+                                <label for="f_address">Address</label>
+                                <input id="f_address" name="address" type="text" autocomplete="off">
+                            </div>
+                            <div class="field">
+                                <label for="f_linkedin">LinkedIn</label>
+                                <input id="f_linkedin" name="linkedin" type="text" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false">
+                            </div>
+                            <div class="field">
+                                <label for="f_twitter">X / Twitter</label>
+                                <input id="f_twitter" name="twitter" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
+                            </div>
+                            <div class="field">
+                                <label for="f_instagram">Instagram</label>
+                                <input id="f_instagram" name="instagram" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
+                            </div>
+                        </div>
+                    </details>
+
+                    <div class="form-error" id="formError" role="alert" hidden></div>
+                </form>
+
+                <div class="actionbar">
+                    <div class="actionbar-inner">
+                        <button class="btn btn-secondary" id="discardBtn" type="button">Discard</button>
+                        <button class="btn btn-success btn-grow" id="saveBtn" type="submit" form="reviewForm">Save contact</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== CONTACT DETAIL ========== -->
+            <section id="viewDetail" class="view has-actionbar" aria-labelledby="detailName" hidden>
+                <button class="text-link back-link" id="backToContacts">‹ All contacts</button>
+
+                <div class="saved-banner" id="savedBanner" role="status" hidden>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg>
+                    <span>Saved to your contacts</span>
+                </div>
+
+                <div class="contact-card">
+                    <h2 id="detailName" tabindex="-1">—</h2>
+                    <div class="company" id="detailCompany"></div>
+                    <div class="contact-fields" id="detailFields"></div>
+                </div>
+
+                <div>
+                    <p class="eyebrow" id="followHeading" style="margin-bottom:10px;">Follow up</p>
+                    <div class="action-grid" role="group" aria-labelledby="followHeading">
+                        <button class="action-btn" id="emailBtn">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-mail"/></svg>
+                            <span>Email</span>
+                        </button>
+                        <button class="action-btn" id="linkedInBtn">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-linkedin"/></svg>
+                            <span>LinkedIn</span>
+                        </button>
+                        <button class="action-btn" id="vcardBtn">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-userplus"/></svg>
+                            <span>Add to phone</span>
+                        </button>
+                    </div>
+                </div>
+
+                <label class="toggle-row">
+                    <span class="toggle-label">Followed up</span>
+                    <input type="checkbox" id="followedToggle">
+                    <span class="toggle-box" aria-hidden="true"></span>
+                </label>
+
+                <div class="detail-manage">
+                    <button class="btn btn-quiet" id="editBtn">Edit details</button>
+                    <button class="btn btn-danger" id="deleteBtn">Delete</button>
+                </div>
+
+                <div class="actionbar">
+                    <div class="actionbar-inner">
+                        <button class="btn btn-primary btn-grow" id="scanNextBtn">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-camera"/></svg>
+                            Scan next card
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== CONTACTS ========== -->
+            <section id="viewContacts" class="view has-tabbar" aria-labelledby="contactsTitle" hidden>
+                <div class="list-head">
+                    <h1 id="contactsTitle" class="view-title" tabindex="-1">Contacts</h1>
+                    <span class="eyebrow" id="contactsSummary"></span>
+                </div>
+
+                <div class="empty-state" id="emptyState">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-card"/></svg>
+                    <p>No contacts yet. Scan a card and it will show up here, ready to follow up.</p>
+                    <button class="btn btn-primary" id="emptyScanBtn">Scan a card</button>
+                </div>
+
+                <ul class="contact-list" id="contactList"></ul>
+
+                <div class="export-block" id="exportBlock">
+                    <button class="btn btn-success btn-block" id="exportCsvBtn">Export all as CSV</button>
+                    <p class="fine-print">The CSV imports into HubSpot, Salesforce, Pipedrive and most other CRMs.<br>Contacts stay on this device until you clear them.</p>
+                    <button class="btn btn-danger" id="clearAllBtn" style="align-self:center;">Clear all contacts</button>
+                </div>
+
+                <div class="list-footer">
+                    <a href="https://buymeacoffee.com/riseabovepartners" target="_blank" rel="noopener" class="footer-coffee">☕ Buy me a coffee</a>
+                    <div class="footer-attribution">Brought to you by <a href="https://rise-above.net" target="_blank" rel="noopener">Rise Above Partners</a></div>
+                </div>
+            </section>
+        </main>
+
+        <nav class="tabbar" id="tabbar" aria-label="Main">
+            <div class="tabbar-inner">
+                <button class="tab" id="tabScan" aria-current="page">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-camera"/></svg>
+                    <span>Scan</span>
+                </button>
+                <button class="tab" id="tabContacts">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-list"/></svg>
+                    <span>Contacts</span>
+                    <span class="tab-badge" id="tabBadge" hidden></span>
+                </button>
             </div>
-        </footer>
+        </nav>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden>
+        <span id="toastMsg"></span>
+        <button id="toastAction" hidden></button>
     </div>
 
     <!-- Email Follow-Up Picker -->
-    <div id="emailPicker" class="picker-modal hidden">
+    <div id="emailPicker" class="picker-modal hidden" role="dialog" aria-modal="true" aria-labelledby="emailPickerTitle">
         <div class="picker-content">
-            <div class="picker-title">Send a Follow-Up</div>
-            <div class="picker-subtitle" id="emailPickerSubtitle">Choose a template</div>
+            <div class="picker-title" id="emailPickerTitle" tabindex="-1">Send a follow-up</div>
+            <div class="picker-subtitle" id="emailPickerSubtitle">Pick a message. It opens as a draft in your email app.</div>
 
-            <div class="template-card" data-template="quick">
-                <div class="template-name">Quick Connect</div>
-                <div class="template-preview">Great connecting with you. I'd love to stay in touch...</div>
-            </div>
-            <div class="template-card" data-template="followup">
-                <div class="template-name">Follow Up on Chat</div>
-                <div class="template-preview">Really enjoyed our conversation. I wanted to follow up...</div>
-            </div>
-            <div class="template-card" data-template="meeting">
-                <div class="template-name">Request a Meeting</div>
-                <div class="template-preview">I'd love to set up a time to chat more about...</div>
-            </div>
-            <div class="template-card" data-template="custom">
-                <div class="template-name">Custom Message</div>
-                <div class="template-preview">Write your own subject and body</div>
-            </div>
+            <button class="template-card" data-template="quick">
+                <span class="template-name">Quick Connect</span>
+                <span class="template-preview">Great connecting with you. I'd love to stay in touch...</span>
+            </button>
+            <button class="template-card" data-template="followup">
+                <span class="template-name">Follow Up on Chat</span>
+                <span class="template-preview">Really enjoyed our conversation. I wanted to follow up...</span>
+            </button>
+            <button class="template-card" data-template="meeting">
+                <span class="template-name">Request a Meeting</span>
+                <span class="template-preview">I'd love to set up a time to chat more about...</span>
+            </button>
+            <button class="template-card" data-template="custom" aria-expanded="false" aria-controls="customEmailInputs">
+                <span class="template-name">Custom Message</span>
+                <span class="template-preview">Write your own subject and body</span>
+            </button>
 
             <div class="custom-template-inputs" id="customEmailInputs">
-                <input type="text" id="customSubject" placeholder="Subject line...">
-                <textarea id="customBody" placeholder="Your message..."></textarea>
+                <label class="sr-only" for="customSubject">Subject</label>
+                <input type="text" id="customSubject" placeholder="Subject line">
+                <label class="sr-only" for="customBody">Message</label>
+                <textarea id="customBody" placeholder="Your message"></textarea>
                 <button class="btn btn-primary" id="sendCustomEmail">Open in Email</button>
             </div>
 
-            <label class="sig-toggle">
+            <label class="toggle-row sig-toggle">
+                <span class="toggle-label">Add Cardvark signature</span>
                 <input type="checkbox" class="sig-checkbox" checked>
-                <span class="sig-box"></span>
-                <span class="sig-label">Add Cardvark signature</span>
+                <span class="toggle-box" aria-hidden="true"></span>
             </label>
 
             <button class="picker-cancel" id="emailPickerCancel">Cancel</button>
@@ -1150,42 +1240,42 @@
     </div>
 
     <!-- LinkedIn Connect Modal -->
-    <div id="linkedInPicker" class="picker-modal hidden">
+    <div id="linkedInPicker" class="picker-modal hidden" role="dialog" aria-modal="true" aria-labelledby="linkedInPickerTitle">
         <div class="picker-content">
-            <div class="picker-title">Connect on LinkedIn</div>
-            <div class="picker-subtitle" id="linkedInPickerSubtitle">Copy a connection note, then open LinkedIn</div>
+            <div class="picker-title" id="linkedInPickerTitle" tabindex="-1">Connect on LinkedIn</div>
+            <div class="picker-subtitle" id="linkedInPickerSubtitle">Tap a note to copy it, then open LinkedIn and paste.</div>
 
-            <div class="note-card" data-note="event">
-                <div class="note-label">Event Connect</div>
-                <div class="note-text" id="noteEvent"></div>
-                <span class="copied-badge">Copied!</span>
-            </div>
-            <div class="note-card" data-note="professional">
-                <div class="note-label">Professional</div>
-                <div class="note-text" id="noteProfessional"></div>
-                <span class="copied-badge">Copied!</span>
-            </div>
-            <div class="note-card" data-note="brief">
-                <div class="note-label">Brief</div>
-                <div class="note-text" id="noteBrief"></div>
-                <span class="copied-badge">Copied!</span>
-            </div>
+            <button class="note-card" data-note="event">
+                <span class="note-label">Event Connect</span>
+                <span class="note-text" id="noteEvent"></span>
+                <span class="copied-badge" aria-hidden="true">Copied</span>
+            </button>
+            <button class="note-card" data-note="professional">
+                <span class="note-label">Professional</span>
+                <span class="note-text" id="noteProfessional"></span>
+                <span class="copied-badge" aria-hidden="true">Copied</span>
+            </button>
+            <button class="note-card" data-note="brief">
+                <span class="note-label">Brief</span>
+                <span class="note-text" id="noteBrief"></span>
+                <span class="copied-badge" aria-hidden="true">Copied</span>
+            </button>
 
-            <label class="sig-toggle">
+            <label class="toggle-row sig-toggle">
+                <span class="toggle-label">Add "via Cardvark" to notes</span>
                 <input type="checkbox" class="sig-checkbox" checked>
-                <span class="sig-box"></span>
-                <span class="sig-label">Add "via Cardvark" to notes</span>
+                <span class="toggle-box" aria-hidden="true"></span>
             </label>
 
-            <button class="btn btn-linkedin" id="openLinkedIn" style="width:100%; margin-top: 12px;">Open LinkedIn</button>
+            <button class="btn btn-linkedin btn-block" id="openLinkedIn" style="margin-top: 12px;">Open LinkedIn</button>
             <button class="picker-cancel" id="linkedInPickerCancel">Cancel</button>
         </div>
     </div>
 
     <!-- Donation Modal -->
-    <div id="donationModal" class="modal-overlay hidden">
+    <div id="donationModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="donationMessage">
         <div class="modal-content">
-            <div class="modal-icon">☕</div>
+            <div class="modal-icon" aria-hidden="true">☕</div>
             <p id="donationMessage"></p>
             <div class="modal-buttons">
                 <a href="https://buymeacoffee.com/riseabovepartners" target="_blank" rel="noopener" class="btn btn-coffee">Buy me a coffee</a>
@@ -1194,27 +1284,38 @@
         </div>
     </div>
 
+    <!-- Confirm dialog -->
+    <div id="confirmModal" class="modal-overlay hidden" role="alertdialog" aria-modal="true" aria-labelledby="confirmMessage">
+        <div class="modal-content">
+            <p id="confirmMessage"></p>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" id="confirmYes" style="color:var(--error);">Clear all</button>
+                <button class="btn btn-primary" id="confirmNo">Keep them</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Post-export "next step" card -->
-    <div id="exportPrompt" class="modal-overlay hidden">
+    <div id="exportPrompt" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="epTitle">
         <div class="modal-content">
             <div class="ep-check" id="exportPromptCount">✓ Contacts ready</div>
-            <div class="ep-title">Now comes the real work: the follow-up.</div>
+            <div class="ep-title" id="epTitle">Now comes the real work: the follow-up.</div>
             <div class="ep-body">A stack of cards is easy. The system that actually turns them into relationships is the hard part — that's what I build for small businesses and the towns and chambers around them.</div>
             <div class="modal-buttons">
                 <a href="https://rise-above.net/ai-newsletter.html" target="_blank" rel="noopener" class="btn btn-primary" id="epNewsletter">Get the weekly AI brief — free</a>
             </div>
             <a href="https://calendar.app.google/3rfdszPynkKYkngN8" target="_blank" rel="noopener" class="ep-secondary" id="epCall">Or book a strategy call →</a>
-            <button class="picker-cancel ep-dismiss" id="epDismiss">No thanks</button>
+            <button class="picker-cancel" id="epDismiss">No thanks</button>
         </div>
     </div>
 
     <!-- About / Rise Above sheet -->
-    <div id="aboutPicker" class="picker-modal hidden">
+    <div id="aboutPicker" class="picker-modal hidden" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
         <div class="picker-content">
-            <div class="picker-title">About Cardvark</div>
+            <div class="picker-title" id="aboutTitle" tabindex="-1">About Cardvark</div>
             <div class="picker-subtitle">A free tool by Rise Above Partners</div>
 
-            <p class="about-lede">I'm Michael. I build <strong>working systems</strong> for small businesses and the towns and chambers around them. Cardvark is one of them — free to use, no account, nothing stored.</p>
+            <p class="about-lede">I'm Michael. I build <strong>working systems</strong> for small businesses and the towns and chambers around them. Cardvark is one of them — free to use, no account. Your contacts stay on this device, and Cardvark doesn't keep your card photos.</p>
 
             <div class="about-eyebrow">More from Rise Above</div>
 
@@ -1241,12 +1342,27 @@
     </div>
 
     <script>
-        // State
+        // ------------------------------------------------------------------
+        // Flow: Scan -> (auto read) -> Review -> Save -> Contact detail
+        // Contacts is home base: every saved contact keeps its follow-up actions.
+        // ------------------------------------------------------------------
+
+        const PROXY_URL = 'https://claude-proxy.michael-eb0.workers.dev';
+        const STORE_KEY = 'cardvark_contacts';
+        const MAX_IMAGE_EDGE = 1600;
+        const DEMO = new URLSearchParams(location.search).has('demo');
+
+        const $ = (id) => document.getElementById(id);
+
+        // ---------- State ----------
         let stream = null;
-        let capturedImage = null;
-        let parsedContact = null;
+        let capturedImage = null;      // data URL of the photo being read
+        let draft = null;              // { contact, isNew, image }
+        let activeId = null;           // contact shown in the detail view
+        let currentView = 'scan';
+        let contacts = loadContacts();
         let sessionScanCount = 0;
-        let contactsBatch = [];
+        let pendingDonation = null;
 
         // Donation prompt config
         const donationThresholds = [2, 10, 20];
@@ -1256,41 +1372,739 @@
             20: "You're clearly putting this to work. If Cardvark's earned it, a quick coffee keeps it free and humming for the next person too."
         };
 
-        // Elements
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const preview = document.getElementById('preview');
-        const captureBtn = document.getElementById('captureBtn');
-        const retakeBtn = document.getElementById('retakeBtn');
-        const processBtn = document.getElementById('processBtn');
-        const captureControls = document.getElementById('captureControls');
-        const reviewControls = document.getElementById('reviewControls');
-        const statusEl = document.getElementById('status');
-        const ocrPreview = document.getElementById('ocrPreview');
-        const contactCard = document.getElementById('contactCard');
-        const saveContactBtn = document.getElementById('saveContactBtn');
-        const scanAnotherBtn = document.getElementById('scanAnotherBtn');
-        const addToBatchBtn = document.getElementById('addToBatchBtn');
-        const donationModal = document.getElementById('donationModal');
-        const donationMessage = document.getElementById('donationMessage');
-        const dismissDonation = document.getElementById('dismissDonation');
-        const installLink = document.getElementById('installLink');
-        const batchSection = document.getElementById('batchSection');
-        const batchList = document.getElementById('batchList');
-        const batchCount = document.getElementById('batchCount');
-        const clearAllBtn = document.getElementById('clearAllBtn');
-        const exportCsvBtn = document.getElementById('exportCsvBtn');
+        // ---------- Helpers ----------
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text == null ? '' : String(text);
+            return div.innerHTML;
+        }
 
-        // Proxy URL
-        const PROXY_URL = 'https://claude-proxy.michael-eb0.workers.dev';
+        function toArray(val) {
+            if (!val) return [];
+            const arr = Array.isArray(val) ? val : [val];
+            return arr.map(v => String(v).trim()).filter(Boolean);
+        }
 
-        // --- Outbound signature (passive referral) ---
+        function str(val) {
+            return val == null ? '' : String(val).trim();
+        }
+
+        function fullName(c) {
+            return [c.first_name, c.last_name].filter(Boolean).join(' ');
+        }
+
+        function displayName(c) {
+            return fullName(c) || c.company || toArray(c.email)[0] || 'Unnamed contact';
+        }
+
+        function roleLine(c) {
+            return [c.job_title, fullName(c) ? c.company : ''].filter(Boolean).join(' at ');
+        }
+
+        function icon(name) {
+            return `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+        }
+
+        function normalizeContact(raw) {
+            raw = raw || {};
+            return {
+                first_name: str(raw.first_name),
+                last_name: str(raw.last_name),
+                company: str(raw.company),
+                job_title: str(raw.job_title),
+                email: toArray(raw.email),
+                phone: toArray(raw.phone),
+                address: str(raw.address),
+                website: str(raw.website),
+                linkedin: str(raw.linkedin),
+                twitter: str(raw.twitter),
+                instagram: str(raw.instagram)
+            };
+        }
+
+        function hasAnyDetail(c) {
+            return Boolean(c.first_name || c.last_name || c.company || c.email.length || c.phone.length);
+        }
+
+        // ---------- Storage (this device only) ----------
+        function loadContacts() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+                return Array.isArray(saved) ? saved : [];
+            } catch (err) {
+                return [];
+            }
+        }
+
+        function persist() {
+            try {
+                localStorage.setItem(STORE_KEY, JSON.stringify(contacts));
+            } catch (err) {
+                // Private mode or full storage: the list still works for this session.
+                console.warn('Could not save contacts to this device', err);
+            }
+            updateBadge();
+        }
+
+        function findContact(id) {
+            return contacts.find(c => c.id === id) || null;
+        }
+
+        function activeContact() {
+            return findContact(activeId);
+        }
+
+        // ---------- View switching ----------
+        const views = {
+            scan: $('viewScan'),
+            review: $('viewReview'),
+            detail: $('viewDetail'),
+            contacts: $('viewContacts')
+        };
+
+        function showView(name, opts = {}) {
+            currentView = name;
+            Object.entries(views).forEach(([key, el]) => { el.hidden = key !== name; });
+
+            const tabbed = name === 'scan' || name === 'contacts';
+            $('tabbar').hidden = !tabbed;
+            $('tabScan').toggleAttribute('aria-current', name === 'scan');
+            $('tabContacts').toggleAttribute('aria-current', name === 'contacts');
+            if (name === 'scan') $('tabScan').setAttribute('aria-current', 'page');
+            if (name === 'contacts') $('tabContacts').setAttribute('aria-current', 'page');
+            $('toast').classList.toggle('above-actionbar', !tabbed);
+
+            if (name === 'scan') ensureCamera();
+
+            if (!opts.fromHistory) {
+                const state = { view: name, id: name === 'detail' ? activeId : null };
+                if (opts.replace) history.replaceState(state, '');
+                else history.pushState(state, '');
+            }
+
+            window.scrollTo(0, 0);
+            const heading = views[name].querySelector('[tabindex="-1"]');
+            if (heading && !opts.initial) heading.focus({ preventScroll: true });
+        }
+
+        // Phone back button / swipe-back moves between screens instead of leaving the app
+        window.addEventListener('popstate', (e) => {
+            closeAllPickers();
+            const state = e.state || { view: 'scan' };
+            if (state.view === 'detail' && findContact(state.id)) {
+                openDetail(state.id, { fromHistory: true });
+            } else if (state.view === 'contacts') {
+                openContacts({ fromHistory: true });
+            } else {
+                draft = null;
+                resetScan();
+                showView('scan', { fromHistory: true });
+            }
+        });
+
+        // ---------- Toast ----------
+        let toastTimer = null;
+
+        function showToast(message, actionLabel, onAction) {
+            clearTimeout(toastTimer);
+            $('toastMsg').textContent = message;
+            const btn = $('toastAction');
+            if (actionLabel) {
+                btn.textContent = actionLabel;
+                btn.hidden = false;
+                btn.onclick = () => { hideToast(); onAction(); };
+            } else {
+                btn.hidden = true;
+                btn.onclick = null;
+            }
+            $('toast').hidden = false;
+            toastTimer = setTimeout(hideToast, actionLabel ? 6000 : 3000);
+        }
+
+        function hideToast() {
+            clearTimeout(toastTimer);
+            $('toast').hidden = true;
+        }
+
+        // ---------- Camera + capture ----------
+        const video = $('video');
+        const frozen = $('frozen');
+        const captureBtn = $('captureBtn');
+        const fileInput = $('fileInput');
+
+        function setScanState(state, detail) {
+            // live | reading | error | nocamera
+            const showFrozen = state === 'reading' || state === 'error';
+            frozen.hidden = !showFrozen;
+            video.hidden = showFrozen;
+            $('cardGuide').hidden = state !== 'live';
+            $('readingOverlay').hidden = state !== 'reading';
+            $('errorOverlay').hidden = state !== 'error';
+            $('noCameraOverlay').hidden = state !== 'nocamera';
+            $('scanControls').hidden = state === 'reading' || state === 'error';
+            $('scanHint').hidden = state !== 'live';
+            captureBtn.disabled = state !== 'live' || !stream;
+            if (state === 'error' && detail) {
+                $('errorTitle').textContent = detail.title;
+                $('errorBody').textContent = detail.body;
+            }
+        }
+
+        function cameraIsLive() {
+            return Boolean(stream && stream.getVideoTracks().some(t => t.readyState === 'live'));
+        }
+
+        async function initCamera() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                setScanState('nocamera');
+                return;
+            }
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment',
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    }
+                });
+                video.srcObject = stream;
+                if ($('readingOverlay').hidden && $('errorOverlay').hidden) setScanState('live');
+            } catch (err) {
+                console.error(err);
+                stream = null;
+                if ($('readingOverlay').hidden && $('errorOverlay').hidden) setScanState('nocamera');
+            }
+        }
+
+        // Re-open the camera if the OS dropped it while the app was in the background
+        function ensureCamera() {
+            if (cameraIsLive()) {
+                if (video.paused) video.play().catch(() => {});
+                return;
+            }
+            if (!$('noCameraOverlay').hidden && stream === null && cameraTried) return;
+            cameraTried = true;
+            initCamera();
+        }
+        let cameraTried = false;
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && currentView === 'scan' && $('readingOverlay').hidden) {
+                if (!cameraIsLive()) initCamera();
+                else if (video.paused) video.play().catch(() => {});
+            }
+        });
+
+        function drawScaled(source, width, height) {
+            const scale = Math.min(1, MAX_IMAGE_EDGE / Math.max(width, height));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.round(width * scale);
+            canvas.height = Math.round(height * scale);
+            canvas.getContext('2d').drawImage(source, 0, 0, canvas.width, canvas.height);
+            return canvas.toDataURL('image/jpeg', 0.88);
+        }
+
+        function capturePhoto() {
+            if (!video.videoWidth) return;
+            capturedImage = drawScaled(video, video.videoWidth, video.videoHeight);
+            readCard();
+        }
+
+        function handleFile(file) {
+            if (!file) return;
+            const url = URL.createObjectURL(file);
+            const img = new Image();
+            img.onload = () => {
+                capturedImage = drawScaled(img, img.naturalWidth, img.naturalHeight);
+                URL.revokeObjectURL(url);
+                readCard();
+            };
+            img.onerror = () => {
+                URL.revokeObjectURL(url);
+                showToast("That file isn't a photo Cardvark can read.");
+            };
+            img.src = url;
+        }
+
+        function resetScan() {
+            capturedImage = null;
+            frozen.removeAttribute('src');
+            setScanState(cameraIsLive() ? 'live' : (cameraTried && !stream ? 'nocamera' : 'live'));
+        }
+
+        // ---------- Read the card (starts automatically after capture) ----------
+        async function parseBusinessCard(imageDataUrl) {
+            if (DEMO) {
+                await new Promise(r => setTimeout(r, 1200));
+                return {
+                    first_name: 'Jordan', last_name: 'Avery', company: 'Driftless Coffee Roasters',
+                    job_title: 'Owner', email: ['jordan@driftlesscoffee.example'], phone: ['(608) 555-0142'],
+                    address: '210 S Main St, Viroqua, WI 54665', website: 'driftlesscoffee.example',
+                    linkedin: null, twitter: null, instagram: '@driftlesscoffee'
+                };
+            }
+
+            const base64Data = imageDataUrl.split(',')[1];
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 45000);
+
+            let response;
+            try {
+                response = await fetch(PROXY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: controller.signal,
+                    body: JSON.stringify({
+                        model: 'claude-sonnet-4-6',
+                        max_tokens: 1024,
+                        messages: [{
+                            role: 'user',
+                            content: [
+                                {
+                                    type: 'image',
+                                    source: { type: 'base64', media_type: 'image/jpeg', data: base64Data }
+                                },
+                                {
+                                    type: 'text',
+                                    text: `Extract contact information from this business card image. Return ONLY a valid JSON object with these exact keys (use null for missing fields, use arrays for email and phone even if there's only one):
+
+{"first_name": "", "last_name": "", "company": "", "job_title": "", "email": [], "phone": [], "address": "", "website": "", "linkedin": "", "twitter": "", "instagram": ""}`
+                                }
+                            ]
+                        }]
+                    })
+                });
+            } catch (err) {
+                const e = new Error('network');
+                e.kind = 'network';
+                throw e;
+            } finally {
+                clearTimeout(timeout);
+            }
+
+            if (!response.ok) {
+                let message = '';
+                try { message = (await response.json()).error?.message || ''; } catch (err) { /* not JSON */ }
+                const e = new Error(message || 'API request failed');
+                e.kind = response.status === 429 ? 'busy' : 'server';
+                throw e;
+            }
+
+            const data = await response.json();
+            const text = data?.content?.[0]?.text || '';
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) {
+                const e = new Error('unreadable');
+                e.kind = 'unreadable';
+                throw e;
+            }
+            try {
+                return JSON.parse(jsonMatch[0]);
+            } catch (err) {
+                const e = new Error('unreadable');
+                e.kind = 'unreadable';
+                throw e;
+            }
+        }
+
+        const readErrors = {
+            network: { title: "Couldn't reach the card reader", body: 'Check your connection, then try again. Your photo is still here.' },
+            busy: { title: 'Too many scans at once', body: 'Give it a moment, then try again.' },
+            unreadable: { title: "Couldn't find contact details", body: 'Retake the photo with the card filling the frame and good light.' },
+            server: { title: "That didn't work", body: 'The card reader had a problem. Try again in a moment.' }
+        };
+
+        async function readCard() {
+            if (!capturedImage) return;
+            frozen.src = capturedImage;
+            setScanState('reading');
+            try {
+                const contact = normalizeContact(await parseBusinessCard(capturedImage));
+                if (!hasAnyDetail(contact)) {
+                    const e = new Error('unreadable');
+                    e.kind = 'unreadable';
+                    throw e;
+                }
+                sessionScanCount++;
+                if (donationThresholds.includes(sessionScanCount)) {
+                    pendingDonation = donationMessages[sessionScanCount];
+                }
+                draft = { contact, isNew: true, image: capturedImage };
+                openReview();
+            } catch (err) {
+                console.error(err);
+                setScanState('error', readErrors[err.kind] || readErrors.server);
+                $('retryBtn').hidden = err.kind === 'unreadable';
+                if (currentView === 'scan') (err.kind === 'unreadable' ? $('retakeBtn') : $('retryBtn')).focus();
+            }
+        }
+
+        // ---------- Review / edit ----------
+        const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        function multiFieldHtml(kind, label, values) {
+            const list = values.length ? values : [''];
+            return list.map((value, i) => {
+                const id = `f_${kind}_${i}`;
+                const attrs = kind === 'email'
+                    ? 'type="email" inputmode="email" autocapitalize="off" spellcheck="false"'
+                    : 'type="tel" inputmode="tel"';
+                const suffix = list.length > 1 ? ` ${i + 1}` : '';
+                return `
+                    <div class="field">
+                        <label for="${id}">${label}${suffix}</label>
+                        <input id="${id}" data-kind="${kind}" ${attrs} autocomplete="off" value="${escapeHtml(value)}">
+                    </div>`;
+            }).join('');
+        }
+
+        function openReview() {
+            const c = draft.contact;
+            $('reviewTitle').textContent = draft.isNew ? 'Check the details' : 'Edit details';
+            $('reviewSub').textContent = draft.isNew
+                ? 'Fix anything the scan got wrong, then save.'
+                : 'Changes apply to this contact everywhere in Cardvark.';
+            $('saveBtn').textContent = draft.isNew ? 'Save contact' : 'Save changes';
+            $('discardBtn').textContent = draft.isNew ? 'Discard' : 'Cancel';
+
+            const photo = $('reviewPhoto');
+            if (draft.image) { photo.src = draft.image; photo.hidden = false; }
+            else { photo.removeAttribute('src'); photo.hidden = true; }
+
+            ['first_name', 'last_name', 'job_title', 'company', 'website', 'address', 'linkedin', 'twitter', 'instagram']
+                .forEach(key => { $('f_' + key).value = c[key] || ''; });
+            $('emailFields').innerHTML = multiFieldHtml('email', 'Email', c.email);
+            $('phoneFields').innerHTML = multiFieldHtml('phone', 'Phone', c.phone);
+            $('moreFields').open = Boolean(c.website || c.address || c.linkedin || c.twitter || c.instagram);
+            $('formError').hidden = true;
+
+            showView('review');
+        }
+
+        function collectForm() {
+            const get = (key) => $('f_' + key).value.trim();
+            const multi = (kind) => Array.from(document.querySelectorAll(`#reviewForm input[data-kind="${kind}"]`))
+                .map(el => el.value.trim()).filter(Boolean);
+            return normalizeContact({
+                first_name: get('first_name'), last_name: get('last_name'),
+                job_title: get('job_title'), company: get('company'),
+                email: multi('email'), phone: multi('phone'),
+                website: get('website'), address: get('address'),
+                linkedin: get('linkedin'), twitter: get('twitter'), instagram: get('instagram')
+            });
+        }
+
+        function saveReview(e) {
+            e.preventDefault();
+            if (!draft) return;
+            const data = collectForm();
+            const error = $('formError');
+
+            // Flag emails that would bounce before they reach a vCard, CSV or CRM
+            let badEmail = null;
+            document.querySelectorAll('#reviewForm input[data-kind="email"]').forEach(el => {
+                const bad = el.value.trim() !== '' && !EMAIL_RE.test(el.value.trim());
+                el.setAttribute('aria-invalid', bad ? 'true' : 'false');
+                if (bad && !badEmail) badEmail = el;
+            });
+            if (badEmail) {
+                error.textContent = "That email address doesn't look right. Check it against the card.";
+                error.hidden = false;
+                badEmail.focus();
+                return;
+            }
+            if (!hasAnyDetail(data)) {
+                error.textContent = 'Add a name, company, email or phone before saving.';
+                error.hidden = false;
+                $('f_first_name').focus();
+                return;
+            }
+            error.hidden = true;
+
+            let id;
+            if (draft.isNew) {
+                id = `c_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+                contacts.unshift({ id, createdAt: Date.now(), followedUp: false, ...data });
+            } else {
+                id = draft.id;
+                const existing = findContact(id);
+                if (existing) Object.assign(existing, data);
+            }
+            persist();
+
+            const wasNew = draft.isNew;
+            draft = null;
+            if (wasNew) {
+                resetScan();
+                // Replace the review screen in history so Back doesn't return to a stale form
+                openDetail(id, { justSaved: true, replace: true });
+                maybeShowDonation();
+            } else {
+                // Editing sits on top of the contact screen: step back to it (re-rendered by popstate)
+                history.back();
+                showToast('Changes saved');
+            }
+        }
+
+        function discardReview() {
+            if (!draft) return;
+            const wasNew = draft.isNew;
+            const id = draft.id;
+            draft = null;
+            if (wasNew) {
+                resetScan();
+                showView('scan', { replace: true });
+                maybeShowDonation();
+            } else {
+                history.back();
+            }
+        }
+
+        // ---------- Contact detail ----------
+        function fieldRow(iconName, value, href) {
+            const inner = href
+                ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(value)}</a>`
+                : escapeHtml(value);
+            return `<div class="contact-field">${icon(iconName)}<span class="value">${inner}</span></div>`;
+        }
+
+        function linkedInProfileUrl(value) {
+            return value.startsWith('http') ? value : `https://linkedin.com/in/${value.replace(/^@/, '')}`;
+        }
+
+        function openDetail(id, opts = {}) {
+            const c = findContact(id);
+            if (!c) { openContacts(opts); return; }
+            activeId = id;
+
+            $('detailName').textContent = displayName(c);
+            const role = roleLine(c);
+            $('detailCompany').textContent = role;
+            $('detailCompany').hidden = !role;
+
+            let html = '';
+            toArray(c.email).forEach(email => { html += fieldRow('mail', email, `mailto:${email}`); });
+            toArray(c.phone).forEach(phone => { html += fieldRow('phone', phone, `tel:${phone.replace(/[^\d+]/g, '')}`); });
+            if (c.address) html += fieldRow('pin', c.address);
+            if (c.website) html += fieldRow('globe', c.website, c.website.startsWith('http') ? c.website : `https://${c.website}`);
+            if (c.linkedin) html += fieldRow('linkedin', c.linkedin, linkedInProfileUrl(c.linkedin));
+            if (c.twitter) { const h = c.twitter.replace(/^@/, ''); html += fieldRow('link', `@${h} on X`, `https://x.com/${h}`); }
+            if (c.instagram) { const h = c.instagram.replace(/^@/, ''); html += fieldRow('link', `@${h} on Instagram`, `https://instagram.com/${h}`); }
+            $('detailFields').innerHTML = html;
+
+            $('emailBtn').hidden = toArray(c.email).length === 0;
+            $('followedToggle').checked = Boolean(c.followedUp);
+            $('savedBanner').hidden = !opts.justSaved;
+            $('backToContacts').textContent = `‹ All contacts (${contacts.length})`;
+
+            showView('detail', opts);
+        }
+
+        function setFollowedUp(value, announce) {
+            const c = activeContact();
+            if (!c) return;
+            c.followedUp = value;
+            persist();
+            $('followedToggle').checked = value;
+            if (announce) showToast(announce);
+        }
+
+        function deleteActive() {
+            const index = contacts.findIndex(c => c.id === activeId);
+            if (index === -1) return;
+            const [removed] = contacts.splice(index, 1);
+            persist();
+            activeId = null;
+            openContacts({ replace: true });
+            showToast(`Deleted ${displayName(removed)}`, 'Undo', () => {
+                contacts.splice(Math.min(index, contacts.length), 0, removed);
+                persist();
+                renderContacts();
+            });
+        }
+
+        // ---------- Contacts list ----------
+        function updateBadge() {
+            const badge = $('tabBadge');
+            badge.hidden = contacts.length === 0;
+            badge.textContent = contacts.length;
+            badge.setAttribute('aria-label', `${contacts.length} saved`);
+        }
+
+        function renderContacts() {
+            const empty = contacts.length === 0;
+            $('emptyState').hidden = !empty;
+            $('contactList').hidden = empty;
+            $('exportBlock').hidden = empty;
+
+            const done = contacts.filter(c => c.followedUp).length;
+            $('contactsSummary').textContent = empty ? '' : `${done} of ${contacts.length} followed up`;
+
+            $('contactList').innerHTML = contacts.map(c => `
+                <li>
+                    <button class="contact-row" data-id="${escapeHtml(c.id)}">
+                        <span class="row-info">
+                            <span class="row-name" style="display:block;">${escapeHtml(displayName(c))}</span>
+                            <span class="row-company" style="display:block;">${escapeHtml(roleLine(c) || toArray(c.email)[0] || toArray(c.phone)[0] || '')}</span>
+                        </span>
+                        ${c.followedUp
+                            ? '<span class="chip chip-done">✓ Followed up</span>'
+                            : '<span class="chip chip-todo">To follow up</span>'}
+                        <svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chevron"/></svg>
+                    </button>
+                </li>`).join('');
+            updateBadge();
+        }
+
+        function openContacts(opts = {}) {
+            renderContacts();
+            showView('contacts', opts);
+        }
+
+        $('contactList').addEventListener('click', (e) => {
+            const row = e.target.closest('.contact-row');
+            if (row) openDetail(row.dataset.id);
+        });
+
+        function confirmClear() {
+            $('confirmMessage').textContent = `Clear all ${contacts.length} contact${contacts.length === 1 ? '' : 's'} from this device? Export first if you still need them.`;
+            $('confirmModal').classList.remove('hidden');
+            $('confirmNo').focus();
+        }
+
+        $('confirmNo').addEventListener('click', () => $('confirmModal').classList.add('hidden'));
+        $('confirmYes').addEventListener('click', () => {
+            const backup = contacts;
+            contacts = [];
+            persist();
+            $('confirmModal').classList.add('hidden');
+            renderContacts();
+            showToast('All contacts cleared', 'Undo', () => {
+                contacts = backup;
+                persist();
+                renderContacts();
+            });
+        });
+
+        // ---------- CSV export ----------
+        function generateCSV(list) {
+            // First email/phone get their own column so CRM importers accept the row as-is
+            const headers = ['First Name', 'Last Name', 'Email', 'Phone', 'Company', 'Job Title', 'Address', 'Website', 'LinkedIn', 'Twitter', 'Instagram', 'Other Emails', 'Other Phones', 'Followed Up'];
+            const rows = list.map(c => {
+                const emails = toArray(c.email);
+                const phones = toArray(c.phone);
+                const values = [
+                    c.first_name || '', c.last_name || '',
+                    emails[0] || '', phones[0] || '',
+                    c.company || '', c.job_title || '', c.address || '', c.website || '',
+                    c.linkedin || '', c.twitter || '', c.instagram || '',
+                    emails.slice(1).join('; '), phones.slice(1).join('; '),
+                    c.followedUp ? 'Yes' : 'No'
+                ];
+                return values.map(v => `"${String(v).replace(/"/g, '""').replace(/\n/g, ' ')}"`).join(',');
+            });
+            return headers.join(',') + '\r\n' + rows.join('\r\n');
+        }
+
+        function downloadBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        function exportCSV() {
+            if (contacts.length === 0) return;
+            const timestamp = new Date().toISOString().slice(0, 10);
+            downloadBlob(new Blob([generateCSV(contacts)], { type: 'text/csv;charset=utf-8;' }), `scanned-contacts-${timestamp}.csv`);
+            const count = contacts.length;
+            showToast(`Exported ${count} contact${count === 1 ? '' : 's'} to CSV`);
+            // Earned moment: offer the next step once per session
+            setTimeout(() => showExportPrompt(count), 600);
+        }
+
+        // ---------- vCard ----------
+        function vEsc(value) {
+            return String(value).replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;');
+        }
+
+        function generateVCard(contact) {
+            const lines = [
+                'BEGIN:VCARD',
+                'VERSION:3.0',
+                `N:${vEsc(contact.last_name || '')};${vEsc(contact.first_name || '')};;;`,
+                `FN:${vEsc(fullName(contact) || contact.company || '')}`
+            ];
+            if (contact.company) lines.push(`ORG:${vEsc(contact.company)}`);
+            if (contact.job_title) lines.push(`TITLE:${vEsc(contact.job_title)}`);
+            toArray(contact.email).forEach(email => lines.push(`EMAIL:${email}`));
+            toArray(contact.phone).forEach(phone => lines.push(`TEL:${phone}`));
+            if (contact.address) lines.push(`ADR:;;${vEsc(contact.address)};;;;`);
+            if (contact.website) lines.push(`URL:${contact.website}`);
+            if (contact.linkedin) lines.push(`X-SOCIALPROFILE;TYPE=linkedin:${linkedInProfileUrl(contact.linkedin)}`);
+            if (contact.twitter) lines.push(`X-SOCIALPROFILE;TYPE=twitter:https://x.com/${contact.twitter.replace(/^@/, '')}`);
+            if (contact.instagram) lines.push(`X-SOCIALPROFILE;TYPE=instagram:https://instagram.com/${contact.instagram.replace(/^@/, '')}`);
+            lines.push('END:VCARD');
+            return lines.join('\r\n');
+        }
+
+        function saveVCard() {
+            const c = activeContact();
+            if (!c) return;
+            const base = (fullName(c) || c.company || 'contact').replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '_') || 'contact';
+            downloadBlob(new Blob([generateVCard(c)], { type: 'text/vcard' }), `${base}.vcf`);
+            showToast('Contact file ready. Open it to add to your phone.');
+        }
+
+        // ---------- Bottom sheets ----------
+        let pickerReturnFocus = null;
+
+        function openPicker(modal) {
+            closeAllPickers();
+            pickerReturnFocus = document.activeElement;
+            modal.classList.remove('hidden');
+            // Force reflow before adding visible class for transition
+            modal.offsetHeight;
+            modal.classList.add('visible');
+            const title = modal.querySelector('.picker-title');
+            if (title) title.focus({ preventScroll: true });
+        }
+
+        function closePicker(modal) {
+            if (!modal.classList.contains('visible')) return;
+            modal.classList.remove('visible');
+            const finish = () => { if (!modal.classList.contains('visible')) modal.classList.add('hidden'); };
+            modal.addEventListener('transitionend', finish, { once: true });
+            setTimeout(finish, 350);
+            if (pickerReturnFocus && document.contains(pickerReturnFocus)) pickerReturnFocus.focus({ preventScroll: true });
+            pickerReturnFocus = null;
+        }
+
+        function closeAllPickers() {
+            document.querySelectorAll('.picker-modal').forEach(m => {
+                m.classList.remove('visible');
+                m.classList.add('hidden');
+            });
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape') return;
+            const open = document.querySelector('.picker-modal.visible');
+            if (open) { closePicker(open); return; }
+            document.querySelectorAll('.modal-overlay:not(.hidden)').forEach(m => m.classList.add('hidden'));
+        });
+
+        // ---------- Outbound signature (passive referral) ----------
         const EMAIL_SIGNATURE = '\n\n— — —\nSent with Cardvark, the business card scanner by Rise Above Partners\nrise-above.net';
         const LINKEDIN_SIGNATURE = ' — via Cardvark by Rise Above';
         const LINKEDIN_MAX = 300;
 
         function signatureOn() {
-            return localStorage.getItem('cardvark_signature') !== 'off';
+            try { return localStorage.getItem('cardvark_signature') !== 'off'; } catch (err) { return true; }
         }
 
         function appendEmailSignature(body) {
@@ -1311,489 +2125,16 @@
             boxes.forEach(box => {
                 box.checked = on;
                 box.addEventListener('change', () => {
-                    localStorage.setItem('cardvark_signature', box.checked ? 'on' : 'off');
+                    try { localStorage.setItem('cardvark_signature', box.checked ? 'on' : 'off'); } catch (err) { /* ignore */ }
                     boxes.forEach(b => { b.checked = box.checked; });
                 });
             });
         }
 
-        // Hide install link if already in standalone mode
-        function initInstallLink() {
-            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-                installLink.style.display = 'none';
-            }
-        }
-
-        // Donation Modal Logic
-        function checkDonationPrompt() {
-            if (donationThresholds.includes(sessionScanCount)) {
-                showDonationModal(donationMessages[sessionScanCount]);
-            }
-        }
-
-        function showDonationModal(message) {
-            donationMessage.textContent = message;
-            donationModal.classList.remove('hidden');
-        }
-
-        function hideDonationModal() {
-            donationModal.classList.add('hidden');
-        }
-
-        dismissDonation.addEventListener('click', hideDonationModal);
-
-        // Close modal on overlay click
-        donationModal.addEventListener('click', (e) => {
-            if (e.target === donationModal) {
-                hideDonationModal();
-            }
-        });
-
-        // Initialize camera
-        async function initCamera() {
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: { 
-                        facingMode: 'environment',
-                        width: { ideal: 1920 },
-                        height: { ideal: 1080 }
-                    }
-                });
-                video.srcObject = stream;
-                captureBtn.disabled = false;
-            } catch (err) {
-                showStatus('Camera access denied. Please allow camera permissions.', 'error');
-                console.error(err);
-            }
-        }
-
-        // Capture photo
-        function capturePhoto() {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0);
-            
-            capturedImage = canvas.toDataURL('image/jpeg', 0.9);
-            preview.src = capturedImage;
-            
-            video.classList.add('hidden');
-            preview.classList.remove('hidden');
-            captureControls.classList.add('hidden');
-            reviewControls.classList.remove('hidden');
-            contactCard.classList.add('hidden');
-            hideStatus();
-        }
-
-        // Retake photo
-        function retakePhoto() {
-            preview.classList.add('hidden');
-            video.classList.remove('hidden');
-            reviewControls.classList.add('hidden');
-            captureControls.classList.remove('hidden');
-            contactCard.classList.add('hidden');
-            ocrPreview.classList.add('hidden');
-            hideStatus();
-            capturedImage = null;
-        }
-
-        // Call Claude Vision API to read business card directly
-        async function parseBusinessCard(imageDataUrl) {
-            showStatus('Reading the card...', 'loading');
-
-            // Extract base64 data from data URL
-            const base64Data = imageDataUrl.split(',')[1];
-
-            const response = await fetch(PROXY_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    model: 'claude-sonnet-4-6',
-                    max_tokens: 1024,
-                    messages: [{
-                        role: 'user',
-                        content: [
-                            {
-                                type: 'image',
-                                source: {
-                                    type: 'base64',
-                                    media_type: 'image/jpeg',
-                                    data: base64Data
-                                }
-                            },
-                            {
-                                type: 'text',
-                                text: `Extract contact information from this business card image. Return ONLY a valid JSON object with these exact keys (use null for missing fields, use arrays for email and phone even if there's only one):
-
-{"first_name": "", "last_name": "", "company": "", "job_title": "", "email": [], "phone": [], "address": "", "website": "", "linkedin": "", "twitter": "", "instagram": ""}`
-                            }
-                        ]
-                    }]
-                })
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error?.message || 'API request failed');
-            }
-
-            const data = await response.json();
-            const text = data.content[0].text;
-            
-            // Extract JSON from response
-            const jsonMatch = text.match(/\{[\s\S]*\}/);
-            if (!jsonMatch) {
-                throw new Error('Could not parse response as JSON');
-            }
-            
-            return JSON.parse(jsonMatch[0]);
-        }
-
-        // Process the card
-        async function processCard() {
-            try {
-                processBtn.disabled = true;
-                ocrPreview.classList.add('hidden');
-                
-                parsedContact = await parseBusinessCard(capturedImage);
-                displayContact(parsedContact);
-                
-                // Increment scan count and check for donation prompt
-                sessionScanCount++;
-                checkDonationPrompt();
-                
-                showStatus('Got it — check the details below', 'success');
-            } catch (err) {
-                showStatus(err.message, 'error');
-                console.error(err);
-            } finally {
-                processBtn.disabled = false;
-            }
-        }
-
-        // Display parsed contact
-        function displayContact(contact) {
-            const name = [contact.first_name, contact.last_name].filter(Boolean).join(' ') || '—';
-            const companyLine = [contact.job_title, contact.company].filter(Boolean).join(' at ') || '—';
-            
-            document.getElementById('contactName').textContent = name;
-            document.getElementById('contactCompany').textContent = companyLine;
-            
-            // Build contact fields dynamically
-            const fieldsContainer = document.getElementById('contactFields');
-            fieldsContainer.innerHTML = '';
-            
-            // Helper to normalize arrays
-            const toArray = (val) => {
-                if (!val) return [];
-                if (Array.isArray(val)) return val.filter(Boolean);
-                return [val];
-            };
-            
-            // Emails
-            const emails = toArray(contact.email);
-            emails.forEach(email => {
-                fieldsContainer.innerHTML += createField('✉️', email, `mailto:${email}`);
-            });
-            
-            // Phones
-            const phones = toArray(contact.phone);
-            phones.forEach(phone => {
-                fieldsContainer.innerHTML += createField('📱', phone, `tel:${phone.replace(/\s/g, '')}`);
-            });
-            
-            // Address
-            if (contact.address) {
-                fieldsContainer.innerHTML += createField('📍', contact.address);
-            }
-            
-            // Website
-            if (contact.website) {
-                const url = contact.website.startsWith('http') ? contact.website : `https://${contact.website}`;
-                fieldsContainer.innerHTML += createField('🌐', contact.website, url);
-            }
-            
-            // LinkedIn
-            if (contact.linkedin) {
-                const url = contact.linkedin.startsWith('http') ? contact.linkedin : `https://linkedin.com/in/${contact.linkedin.replace(/^@/, '')}`;
-                fieldsContainer.innerHTML += createField('💼', contact.linkedin, url);
-            }
-            
-            // Twitter/X
-            if (contact.twitter) {
-                const handle = contact.twitter.replace(/^@/, '');
-                fieldsContainer.innerHTML += createField('𝕏', `@${handle}`, `https://x.com/${handle}`);
-            }
-            
-            // Instagram
-            if (contact.instagram) {
-                const handle = contact.instagram.replace(/^@/, '');
-                fieldsContainer.innerHTML += createField('📷', `@${handle}`, `https://instagram.com/${handle}`);
-            }
-            
-            contactCard.classList.remove('hidden');
-
-            // Show/hide follow-up button based on email availability
-            const hasEmail = toArray(contact.email).length > 0;
-            followUpBtn.style.display = hasEmail ? '' : 'none';
-
-            // Show/hide LinkedIn button — need a name, company, or linkedin URL to search
-            const hasLinkedInData = contact.linkedin || contact.first_name || contact.last_name || contact.company;
-            linkedInBtn.style.display = hasLinkedInData ? '' : 'none';
-        }
-
-        function createField(icon, value, href = null) {
-            const linkHtml = href 
-                ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(value)}</a>`
-                : escapeHtml(value);
-            return `
-                <div class="contact-field">
-                    <span class="icon">${icon}</span>
-                    <span class="value">${linkHtml}</span>
-                </div>
-            `;
-        }
-
-        // Batch management
-        function addToBatch() {
-            if (!parsedContact) return;
-            
-            contactsBatch.push({...parsedContact});
-            updateBatchUI();
-            showStatus('Added to your list', 'success');
-            
-            // Reset for next scan
-            setTimeout(() => {
-                scanAnother();
-            }, 500);
-        }
-
-        function removeFromBatch(index) {
-            contactsBatch.splice(index, 1);
-            updateBatchUI();
-        }
-
-        function clearBatch() {
-            if (contactsBatch.length === 0) return;
-            if (confirm(`Clear all ${contactsBatch.length} contacts?`)) {
-                contactsBatch = [];
-                updateBatchUI();
-            }
-        }
-
-        function updateBatchUI() {
-            batchCount.textContent = contactsBatch.length;
-            
-            if (contactsBatch.length > 0) {
-                batchSection.classList.remove('hidden');
-                
-                batchList.innerHTML = contactsBatch.map((contact, index) => {
-                    const name = [contact.first_name, contact.last_name].filter(Boolean).join(' ') || 'Unknown';
-                    const company = contact.company || '';
-                    return `
-                        <div class="batch-item">
-                            <div class="batch-item-info">
-                                <div class="batch-item-name">${escapeHtml(name)}</div>
-                                <div class="batch-item-company">${escapeHtml(company)}</div>
-                            </div>
-                            <button class="batch-item-remove" onclick="removeFromBatch(${index})">×</button>
-                        </div>
-                    `;
-                }).join('');
-            } else {
-                batchSection.classList.add('hidden');
-            }
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // CSV Export
-        function generateCSV(contacts) {
-            const headers = ['First Name', 'Last Name', 'Email', 'Phone', 'Company', 'Job Title', 'Address', 'Website', 'LinkedIn', 'Twitter', 'Instagram'];
-            
-            // Helper to normalize arrays and join with semicolon
-            const toArray = (val) => {
-                if (!val) return [];
-                if (Array.isArray(val)) return val.filter(Boolean);
-                return [val];
-            };
-            
-            const rows = contacts.map(contact => {
-                const values = [
-                    contact.first_name || '',
-                    contact.last_name || '',
-                    toArray(contact.email).join('; '),
-                    toArray(contact.phone).join('; '),
-                    contact.company || '',
-                    contact.job_title || '',
-                    contact.address || '',
-                    contact.website || '',
-                    contact.linkedin || '',
-                    contact.twitter || '',
-                    contact.instagram || ''
-                ];
-                // Escape commas, quotes, and newlines in values
-                return values.map(v => `"${String(v).replace(/"/g, '""').replace(/\n/g, ' ')}"`).join(',');
-            });
-            
-            return headers.join(',') + '\r\n' + rows.join('\r\n');
-        }
-
-        function exportCSV() {
-            if (contactsBatch.length === 0) {
-                showStatus('No contacts to export', 'error');
-                return;
-            }
-
-            const csv = generateCSV(contactsBatch);
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            
-            const timestamp = new Date().toISOString().slice(0, 10);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `scanned-contacts-${timestamp}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            const exportedCount = contactsBatch.length;
-            showStatus(`Exported ${exportedCount} contact${exportedCount === 1 ? '' : 's'} to CSV`, 'success');
-            // Earned moment: offer the next step once per session
-            setTimeout(() => showExportPrompt(exportedCount), 600);
-        }
-
-        // Save contact using vCard download
-        function saveContact() {
-            if (!parsedContact) return;
-
-            const vcard = generateVCard(parsedContact);
-            const blob = new Blob([vcard], { type: 'text/vcard' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${parsedContact.first_name || 'contact'}_${parsedContact.last_name || ''}.vcf`.trim();
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showStatus('Contact saved', 'success');
-        }
-
-        function generateVCard(contact) {
-            // Helper to normalize arrays
-            const toArray = (val) => {
-                if (!val) return [];
-                if (Array.isArray(val)) return val.filter(Boolean);
-                return [val];
-            };
-            
-            const lines = [
-                'BEGIN:VCARD',
-                'VERSION:3.0',
-                `N:${contact.last_name || ''};${contact.first_name || ''};;;`,
-                `FN:${[contact.first_name, contact.last_name].filter(Boolean).join(' ')}`,
-            ];
-            
-            if (contact.company) lines.push(`ORG:${contact.company}`);
-            if (contact.job_title) lines.push(`TITLE:${contact.job_title}`);
-            
-            // Multiple emails
-            toArray(contact.email).forEach(email => {
-                lines.push(`EMAIL:${email}`);
-            });
-            
-            // Multiple phones
-            toArray(contact.phone).forEach(phone => {
-                lines.push(`TEL:${phone}`);
-            });
-            
-            if (contact.address) lines.push(`ADR:;;${contact.address};;;;`);
-            if (contact.website) lines.push(`URL:${contact.website}`);
-            
-            // Social profiles
-            if (contact.linkedin) {
-                const url = contact.linkedin.startsWith('http') ? contact.linkedin : `https://linkedin.com/in/${contact.linkedin.replace(/^@/, '')}`;
-                lines.push(`X-SOCIALPROFILE;TYPE=linkedin:${url}`);
-            }
-            if (contact.twitter) {
-                const handle = contact.twitter.replace(/^@/, '');
-                lines.push(`X-SOCIALPROFILE;TYPE=twitter:https://x.com/${handle}`);
-            }
-            if (contact.instagram) {
-                const handle = contact.instagram.replace(/^@/, '');
-                lines.push(`X-SOCIALPROFILE;TYPE=instagram:https://instagram.com/${handle}`);
-            }
-            
-            lines.push('END:VCARD');
-            return lines.join('\r\n');
-        }
-
-        // Scan another card
-        function scanAnother() {
-            retakePhoto();
-            parsedContact = null;
-        }
-
-        // Utility functions
-        function showStatus(message, type) {
-            statusEl.textContent = message;
-            statusEl.className = `status ${type}`;
-            statusEl.classList.remove('hidden');
-        }
-
-        function hideStatus() {
-            statusEl.classList.add('hidden');
-        }
-
-        function loadScript(src) {
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = src;
-                script.onload = resolve;
-                script.onerror = reject;
-                document.head.appendChild(script);
-            });
-        }
-
-        // Picker modal open/close with animation
-        function openPicker(modal) {
-            closeAllPickers();
-            modal.classList.remove('hidden');
-            // Force reflow before adding visible class for transition
-            modal.offsetHeight;
-            modal.classList.add('visible');
-        }
-
-        function closePicker(modal) {
-            modal.classList.remove('visible');
-            modal.addEventListener('transitionend', function handler() {
-                modal.classList.add('hidden');
-                modal.removeEventListener('transitionend', handler);
-            });
-        }
-
-        function closeAllPickers() {
-            document.querySelectorAll('.picker-modal').forEach(m => {
-                m.classList.remove('visible');
-                m.classList.add('hidden');
-            });
-        }
-
-        // --- Feature 2: Email Follow-Up ---
-        const emailPicker = document.getElementById('emailPicker');
-        const emailPickerSubtitle = document.getElementById('emailPickerSubtitle');
-        const customEmailInputs = document.getElementById('customEmailInputs');
-        const followUpBtn = document.getElementById('followUpBtn');
+        // ---------- Email follow-up ----------
+        const emailPicker = $('emailPicker');
+        const customEmailInputs = $('customEmailInputs');
+        const customCard = document.querySelector('#emailPicker .template-card[data-template="custom"]');
 
         const emailTemplates = {
             quick: {
@@ -1811,17 +2152,18 @@
         };
 
         function openEmailPicker() {
-            if (!parsedContact) return;
-            closeAllPickers();
-            const emails = Array.isArray(parsedContact.email) ? parsedContact.email.filter(Boolean) : (parsedContact.email ? [parsedContact.email] : []);
+            const c = activeContact();
+            if (!c) return;
+            const emails = toArray(c.email);
             if (emails.length === 0) return;
-            const name = [parsedContact.first_name, parsedContact.last_name].filter(Boolean).join(' ') || 'contact';
-            emailPickerSubtitle.textContent = `To: ${name} (${emails[0]})`;
+            $('emailPickerSubtitle').textContent = `To ${displayName(c)} (${emails[0]}). Opens as a draft in your email app.`;
             customEmailInputs.classList.remove('active');
+            customCard.setAttribute('aria-expanded', 'false');
             openPicker(emailPicker);
         }
 
         function openMailto(email, subject, body) {
+            // Temporary <a> (not window.location) for mobile PWA reliability
             const url = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             const a = document.createElement('a');
             a.href = url;
@@ -1831,87 +2173,76 @@
             document.body.removeChild(a);
         }
 
-        function sendTemplateEmail(templateId) {
-            if (!parsedContact) return;
-            const emails = Array.isArray(parsedContact.email) ? parsedContact.email.filter(Boolean) : (parsedContact.email ? [parsedContact.email] : []);
+        function sendEmail(subject, body) {
+            const c = activeContact();
+            if (!c) return;
+            const emails = toArray(c.email);
             if (emails.length === 0) return;
-            const tmpl = emailTemplates[templateId];
-            openMailto(emails[0], tmpl.subject(parsedContact), appendEmailSignature(tmpl.body(parsedContact)));
+            openMailto(emails[0], subject, appendEmailSignature(body));
             closePicker(emailPicker);
-            showStatus('Email draft opened', 'success');
+            setFollowedUp(true, 'Email draft opened. Marked as followed up.');
         }
 
-        function sendCustomEmail() {
-            if (!parsedContact) return;
-            const emails = Array.isArray(parsedContact.email) ? parsedContact.email.filter(Boolean) : (parsedContact.email ? [parsedContact.email] : []);
-            if (emails.length === 0) return;
-            openMailto(emails[0], document.getElementById('customSubject').value, appendEmailSignature(document.getElementById('customBody').value));
-            closePicker(emailPicker);
-            showStatus('Email draft opened', 'success');
-        }
-
-        // Template card clicks
         document.querySelectorAll('#emailPicker .template-card').forEach(card => {
             card.addEventListener('click', () => {
+                const c = activeContact();
+                if (!c) return;
                 const tmpl = card.dataset.template;
                 if (tmpl === 'custom') {
-                    customEmailInputs.classList.toggle('active');
-                    if (parsedContact) {
-                        document.getElementById('customBody').value = `Hi${parsedContact.first_name ? ' ' + parsedContact.first_name : ''},\n\n`;
+                    const open = customEmailInputs.classList.toggle('active');
+                    card.setAttribute('aria-expanded', String(open));
+                    if (open) {
+                        $('customBody').value = `Hi${c.first_name ? ' ' + c.first_name : ''},\n\n`;
+                        $('customSubject').focus();
                     }
                 } else {
-                    sendTemplateEmail(tmpl);
+                    sendEmail(emailTemplates[tmpl].subject(c), emailTemplates[tmpl].body(c));
                 }
             });
         });
 
-        // Scroll inputs into view when iOS keyboard appears
-        document.getElementById('customSubject').addEventListener('focus', (e) => {
-            setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
-        });
-        document.getElementById('customBody').addEventListener('focus', (e) => {
-            setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
+        // Scroll inputs into view when the iOS keyboard appears
+        ['customSubject', 'customBody'].forEach(id => {
+            $(id).addEventListener('focus', (e) => {
+                setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
+            });
         });
 
-        document.getElementById('sendCustomEmail').addEventListener('click', sendCustomEmail);
-        document.getElementById('emailPickerCancel').addEventListener('click', () => closePicker(emailPicker));
+        $('sendCustomEmail').addEventListener('click', () => sendEmail($('customSubject').value, $('customBody').value));
+        $('emailPickerCancel').addEventListener('click', () => closePicker(emailPicker));
         emailPicker.addEventListener('click', (e) => { if (e.target === emailPicker) closePicker(emailPicker); });
 
-        // --- Feature 3: LinkedIn + Follow ---
-        const linkedInPicker = document.getElementById('linkedInPicker');
-        const linkedInBtn = document.getElementById('linkedInBtn');
+        // ---------- LinkedIn connect ----------
+        const linkedInPicker = $('linkedInPicker');
         let linkedInUrl = '';
 
         function openLinkedInPicker() {
-            if (!parsedContact) return;
-            closeAllPickers();
-            const firstName = parsedContact.first_name || '';
-            const lastName = parsedContact.last_name || '';
-            const company = parsedContact.company || '';
-            const name = [firstName, lastName].filter(Boolean).join(' ') || 'this contact';
+            const c = activeContact();
+            if (!c) return;
+            const firstName = c.first_name || '';
+            const lastName = c.last_name || '';
+            const company = c.company || '';
+            const name = fullName(c) || 'this contact';
 
-            document.getElementById('linkedInPickerSubtitle').textContent = `Copy a note, then find ${name} on LinkedIn`;
+            $('linkedInPickerSubtitle').textContent = `Tap a note to copy it, then find ${name} on LinkedIn and paste.`;
 
-            // Build connection notes
             const greeting = firstName ? `Hi ${firstName}, ` : 'Hi, ';
-            document.getElementById('noteEvent').textContent = `${greeting}great meeting you! Wanted to connect here to stay in touch.`;
-            document.getElementById('noteProfessional').textContent = `${greeting}I came across your work at ${company || 'your company'} and would love to connect.`;
-            document.getElementById('noteBrief').textContent = firstName ? `Hi ${firstName} — let's connect!` : `Hey — let's connect!`;
+            $('noteEvent').textContent = `${greeting}great meeting you! Wanted to connect here to stay in touch.`;
+            $('noteProfessional').textContent = `${greeting}I came across your work at ${company || 'your company'} and would love to connect.`;
+            $('noteBrief').textContent = firstName ? `Hi ${firstName} — let's connect!` : `Hey — let's connect!`;
 
-            // Build LinkedIn URL
-            if (parsedContact.linkedin) {
-                linkedInUrl = parsedContact.linkedin.startsWith('http') ? parsedContact.linkedin : `https://linkedin.com/in/${parsedContact.linkedin.replace(/^@/, '')}`;
+            if (c.linkedin) {
+                linkedInUrl = linkedInProfileUrl(c.linkedin);
             } else {
-                const query = [firstName, lastName, company, 'site:linkedin.com/in/'].filter(Boolean).join('+');
+                // Google search scoped to LinkedIn profiles: no API or login needed
+                const query = [firstName, lastName, company, 'site:linkedin.com/in/'].filter(Boolean).join(' ');
                 linkedInUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
             }
 
-            // Reset copied badges
             document.querySelectorAll('#linkedInPicker .copied-badge').forEach(b => b.classList.remove('show'));
             openPicker(linkedInPicker);
         }
 
-        // Note card copy
         document.querySelectorAll('#linkedInPicker .note-card').forEach(card => {
             card.addEventListener('click', async () => {
                 const text = appendLinkedInSignature(card.querySelector('.note-text').textContent);
@@ -1929,78 +2260,122 @@
                     document.execCommand('copy');
                     document.body.removeChild(ta);
                 }
-                // Reset all badges, show this one
                 document.querySelectorAll('#linkedInPicker .copied-badge').forEach(b => b.classList.remove('show'));
                 const badge = card.querySelector('.copied-badge');
                 badge.classList.add('show');
+                showToast('Note copied');
                 setTimeout(() => badge.classList.remove('show'), 2000);
             });
         });
 
-        document.getElementById('openLinkedIn').addEventListener('click', () => {
+        $('openLinkedIn').addEventListener('click', () => {
             window.open(linkedInUrl, '_blank', 'noopener');
             closePicker(linkedInPicker);
-            showStatus('LinkedIn opened — paste your note!', 'success');
+            setFollowedUp(true, 'LinkedIn opened. Marked as followed up.');
         });
 
-        document.getElementById('linkedInPickerCancel').addEventListener('click', () => closePicker(linkedInPicker));
+        $('linkedInPickerCancel').addEventListener('click', () => closePicker(linkedInPicker));
         linkedInPicker.addEventListener('click', (e) => { if (e.target === linkedInPicker) closePicker(linkedInPicker); });
 
-        // --- About / Rise Above sheet ---
-        const aboutPicker = document.getElementById('aboutPicker');
-        document.getElementById('aboutBtn').addEventListener('click', () => {
+        // ---------- About / Rise Above sheet ----------
+        const aboutPicker = $('aboutPicker');
+        $('aboutBtn').addEventListener('click', () => {
             if (window.plausible) plausible('About Opened');
             openPicker(aboutPicker);
         });
-        document.getElementById('aboutPickerCancel').addEventListener('click', () => closePicker(aboutPicker));
+        $('aboutPickerCancel').addEventListener('click', () => closePicker(aboutPicker));
         aboutPicker.addEventListener('click', (e) => { if (e.target === aboutPicker) closePicker(aboutPicker); });
-        // Track outbound clicks within the About sheet
         aboutPicker.querySelectorAll('.about-link').forEach(a => {
             a.addEventListener('click', () => {
                 if (window.plausible) plausible('About Link', { props: { to: a.querySelector('.al-title')?.textContent || a.href } });
             });
         });
 
-        // --- Post-export "next step" prompt (value-first, once per session) ---
-        const exportPrompt = document.getElementById('exportPrompt');
+        // ---------- Donation prompt (after a save, never on top of a result) ----------
+        const donationModal = $('donationModal');
+
+        function maybeShowDonation() {
+            if (!pendingDonation) return;
+            const message = pendingDonation;
+            pendingDonation = null;
+            setTimeout(() => {
+                $('donationMessage').textContent = message;
+                donationModal.classList.remove('hidden');
+                $('dismissDonation').focus();
+            }, 900);
+        }
+
+        $('dismissDonation').addEventListener('click', () => donationModal.classList.add('hidden'));
+        donationModal.addEventListener('click', (e) => { if (e.target === donationModal) donationModal.classList.add('hidden'); });
+
+        // ---------- Post-export "next step" prompt (value-first, once per session) ----------
+        const exportPrompt = $('exportPrompt');
+
         function showExportPrompt(count) {
-            if (sessionStorage.getItem('cardvark_export_prompt') === 'shown') return;
-            sessionStorage.setItem('cardvark_export_prompt', 'shown');
-            document.getElementById('exportPromptCount').textContent = `✓ ${count} contact${count === 1 ? '' : 's'} ready to follow up`;
+            try {
+                if (sessionStorage.getItem('cardvark_export_prompt') === 'shown') return;
+                sessionStorage.setItem('cardvark_export_prompt', 'shown');
+            } catch (err) { /* ignore */ }
+            $('exportPromptCount').textContent = `✓ ${count} contact${count === 1 ? '' : 's'} ready to follow up`;
             exportPrompt.classList.remove('hidden');
             if (window.plausible) plausible('Export Prompt Shown');
         }
+
         function hideExportPrompt() { exportPrompt.classList.add('hidden'); }
-        document.getElementById('epDismiss').addEventListener('click', hideExportPrompt);
+        $('epDismiss').addEventListener('click', hideExportPrompt);
         exportPrompt.addEventListener('click', (e) => { if (e.target === exportPrompt) hideExportPrompt(); });
-        document.getElementById('epNewsletter').addEventListener('click', () => {
+        $('epNewsletter').addEventListener('click', () => {
             if (window.plausible) plausible('Export Prompt CTA', { props: { cta: 'newsletter' } });
         });
-        document.getElementById('epCall').addEventListener('click', () => {
+        $('epCall').addEventListener('click', () => {
             if (window.plausible) plausible('Export Prompt CTA', { props: { cta: 'call' } });
         });
 
-        // Event listeners
+        // ---------- Event listeners ----------
         captureBtn.addEventListener('click', capturePhoto);
-        retakeBtn.addEventListener('click', retakePhoto);
-        processBtn.addEventListener('click', processCard);
-        saveContactBtn.addEventListener('click', saveContact);
-        scanAnotherBtn.addEventListener('click', scanAnother);
-        addToBatchBtn.addEventListener('click', addToBatch);
-        clearAllBtn.addEventListener('click', clearBatch);
-        exportCsvBtn.addEventListener('click', exportCSV);
-        followUpBtn.addEventListener('click', openEmailPicker);
-        linkedInBtn.addEventListener('click', openLinkedInPicker);
+        $('uploadBtn').addEventListener('click', () => fileInput.click());
+        $('uploadFallbackBtn').addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', () => { handleFile(fileInput.files[0]); fileInput.value = ''; });
+        $('retryBtn').addEventListener('click', readCard);
+        $('retakeBtn').addEventListener('click', resetScan);
+
+        $('reviewForm').addEventListener('submit', saveReview);
+        $('discardBtn').addEventListener('click', discardReview);
+
+        $('emailBtn').addEventListener('click', openEmailPicker);
+        $('linkedInBtn').addEventListener('click', openLinkedInPicker);
+        $('vcardBtn').addEventListener('click', saveVCard);
+        $('followedToggle').addEventListener('change', (e) => setFollowedUp(e.target.checked));
+        $('editBtn').addEventListener('click', () => {
+            const c = activeContact();
+            if (!c) return;
+            draft = { contact: normalizeContact(c), isNew: false, id: c.id, image: null };
+            openReview();
+        });
+        $('deleteBtn').addEventListener('click', deleteActive);
+        $('scanNextBtn').addEventListener('click', () => { resetScan(); showView('scan'); });
+        $('backToContacts').addEventListener('click', () => openContacts());
+
+        $('tabScan').addEventListener('click', () => { if (currentView !== 'scan') showView('scan'); });
+        $('tabContacts').addEventListener('click', () => { if (currentView !== 'contacts') openContacts(); });
+        $('emptyScanBtn').addEventListener('click', () => showView('scan'));
+        $('exportCsvBtn').addEventListener('click', exportCSV);
+        $('clearAllBtn').addEventListener('click', confirmClear);
 
         // Register service worker for PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(console.error);
         }
 
-        // Initialize
-        initCamera();
-        initInstallLink();
+        // ---------- Initialize ----------
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            $('installLink').hidden = true;
+        }
+        $('demoFlag').hidden = !DEMO;
         initSignatureToggles();
+        updateBadge();
+        setScanState('live');
+        showView('scan', { replace: true, initial: true });
     </script>
 </body>
 </html>
